@@ -176,23 +176,20 @@
     return bar;
   }
 
-  $('#input-form').one(
-    'submit', submitData
-  );
-
   function submitData()
   {
     var yellowScore = $('#yellow-score').val();
     var blueScore = $('#blue-score').val();
     var winner = yellowScore > blueScore ? 'Yella' : 'Blue';
 
-    var q1ID = "entry.247460283"; // Winner
-    var q2ID = "entry.449488357"; // Yellow Score
-    var q3ID = "entry.1023685467"; // Blue Score
-    var q4ID = "entry.569780061"; // Yellow Attack
-    var q5ID = "entry.417127845"; // Yellow Defense
-    var q6ID = "entry.855683837"; // Blue Attack
-    var q7ID = "entry.1044104149"; // Blue Defense
+    var q1ID = "entry.247460283";   // Winner
+    var q2ID = "entry.449488357";   // Yellow Score
+    var q3ID = "entry.1023685467";  // Blue Score
+    var q4ID = "entry.569780061";   // Yellow Attack
+    var q5ID = "entry.417127845";   // Yellow Defense
+    var q6ID = "entry.855683837";   // Blue Attack
+    var q7ID = "entry.1044104149";  // Blue Defense
+    var q8ID = "entry.131725794";   // Notes
 
     var value1 = encodeURIComponent(winner);
     var value2 = encodeURIComponent(yellowScore);
@@ -201,6 +198,7 @@
     var value5 = encodeURIComponent(players[3]);
     var value6 = encodeURIComponent(players[0]);
     var value7 = encodeURIComponent(players[1]);
+    var value8 = encodeURIComponent('');
 
     var baseURL = 'https://docs.google.com/forms/d/e/1FAIpQLScY-Gg9_PbdVVIkMYqMpJJwzoy1FVBZhAFdgoIBOmsNh4wdbQ/formResponse?';
     var submitRef = 'submit=4429263762118249483';
@@ -210,7 +208,8 @@
                                 q4ID + "=" + value4 + "&" + 
                                 q5ID + "=" + value5 + "&" + 
                                 q6ID + "=" + value6 + "&" + 
-                                q7ID + "=" + value7 + "&" + submitRef);
+                                q7ID + "=" + value7 + "&" +
+                                q8ID + "=" + value8 + "&" + submitRef);
     console.log(submitURL);
     document.getElementById('no-target').src = submitURL;
   }
@@ -504,7 +503,7 @@
 
         <span id="versus">VS</span>
         <button type="button" class="btn btn-secondary btn-lg" id="reset-submit" onclick="location.reload();"><i class="fa fa-repeat" aria-hidden="true"></i> Reset</button>
-        <button  type="submit" class="btn btn-secondary btn-lg" id="form-submit" onclick="submitData(); this.disabled=true; this.html='Submitted';">Submit</button>
+        <button  type="submit" class="btn btn-secondary btn-lg" id="form-submit" onclick="submitData(); this.disabled = true; $(this).html = 'Submitted';">Submit</button>
 
       <div class="col-md-6 yellow">
         <span id="yellow-team"><h1>Team Yellow</h1></span>
