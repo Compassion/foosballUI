@@ -103,19 +103,19 @@
         $('#yellow-defense').html("<h3>" + yDefense + "</h3>");
 
         // Animation sequence
-        $('#blue-team').delay(3000).animate(bAnimate, { duration: 'fast', easing: 'easeInOutCirc', complete: function() { playSound('blue-team') } } );
-        $('.blue-attack').delay(5000).animate(bAnimate, { duration: 'fast', easing: 'easeInOutCirc', complete: function() { playSound(players[0]+'-attack') } } );
-        $('.blue-defense').delay(7000).animate(bAnimate, { duration: 'fast', easing: 'easeInOutCirc', complete: function() { playSound(players[1]+'-defense') } } );
-        $('#versus').delay(8500).animate({top: '38%'}, { duration: 'fast', easing: 'easeInOutCirc', complete: function() { playSound('versus') } } );
-        $('#yellow-team').delay(10000).animate(yAnimate, { duration: 'fast', easing: 'easeInOutCirc', complete: function() { playSound('yellow-team') } } );
-        $('.yellow-attack').delay(12000).animate(yAnimate, { duration: 'fast', easing: 'easeInOutCirc', complete: function() { playSound(players[2]+'-attack') } } );
-        $('.yellow-defense').delay(14000).animate(yAnimate, { duration: 'fast', easing: 'easeInOutCirc', complete: function() { playSound(players[3]+'-defense') } } );
+        $('#blue-team').delay(1000).animate(bAnimate, { duration: 'fast', easing: 'easeInOutCirc', complete: function() { playSound('blue-team') } } );
+        $('.blue-attack').delay(3000).animate(bAnimate, { duration: 'fast', easing: 'easeInOutCirc', complete: function() { playSound(players[0]+'-attack') } } );
+        $('.blue-defense').delay(5000).animate(bAnimate, { duration: 'fast', easing: 'easeInOutCirc', complete: function() { playSound(players[1]+'-defense') } } );
+        $('#versus').delay(6000).animate({top: '38%'}, { duration: 'fast', easing: 'easeInOutCirc', complete: function() { playSound('versus') } } );
+        $('#yellow-team').delay(7000).animate(yAnimate, { duration: 'fast', easing: 'easeInOutCirc', complete: function() { playSound('yellow-team') } } );
+        $('.yellow-attack').delay(9000).animate(yAnimate, { duration: 'fast', easing: 'easeInOutCirc', complete: function() { playSound(players[2]+'-attack') } } );
+        $('.yellow-defense').delay(11000).animate(yAnimate, { duration: 'fast', easing: 'easeInOutCirc', complete: function() { playSound(players[3]+'-defense') } } );
 
         $('#game').show();
         setTimeout(
           function(){
             calculateStakes(bRating, yRating)
-          }, 16000)
+          }, 12000)
     }
 
     function playSound(soundName)
@@ -155,9 +155,10 @@
       
       $('#reset-submit').delay(5000).animate({bottom: '0'}, { duration: 'slow', easing: 'easeInOutCirc' });
       $('#form-submit').delay(5000).animate({bottom: '0'}, { duration: 'slow', easing: 'easeInOutCirc' });
+      $('#notes').delay(6000).animate({bottom: '6%'}, { duration: 'slow', easing: 'easeInOutCirc' });
       
-      $('#blue-score').delay(10000).animate({left: '5%'}, { duration: 'slow', easing: 'easeInOutCirc' });
-      $('#yellow-score').delay(10000).animate({right: '5%'}, { duration: 'slow', easing: 'easeInOutCirc' });
+      $('#blue-score').delay(7000).animate({left: '1.5%'}, { duration: 'slow', easing: 'easeInOutCirc' });
+      $('#yellow-score').delay(7000).animate({right: '1.5%'}, { duration: 'slow', easing: 'easeInOutCirc' });
   }
 
   function renderCount(field, newValue) {
@@ -178,9 +179,9 @@
 
   function submitData()
   {
-    var yellowScore = $('#yellow-score').val();
-    var blueScore = $('#blue-score').val();
-    var winner = yellowScore > blueScore ? 'Yella' : 'Blue';
+    var blueScore = parseInt($('#blue-score').val());
+    var yellowScore = parseInt($('#yellow-score').val());
+    var winner = (blueScore > yellowScore) ? 'Blue' : 'Yella';
 
     var q1ID = "entry.247460283";   // Winner
     var q2ID = "entry.449488357";   // Yellow Score
@@ -224,6 +225,11 @@
     body {
         display: flex;
         overflow: hidden;
+    }
+    @media (min-width: 1200px){
+      .container {
+          width: 1700px;
+      }
     }
     .container {
         margin: auto; 
@@ -392,7 +398,7 @@
     .chart-center {    
       position: absolute;
       width: 100%;
-      top: 1.4vw;
+      top: 1.7vw;
       font-size: 1.8vw;
       letter-spacing: -1px;
       z-index: 1000;
@@ -434,26 +440,56 @@
       text-align: center;
       border: 1px solid #555;
       background-color: #FFF;
-      box-shadow: #333 1px 1px 0px;
       color: #333;
       margin: 0 2%;
       display: inline;
-      font-size: 60px;
+      font-size: 71px;
       position: absolute;
+      top: 36.3%;
+      letter-spacing: -1px;
     }
 
     #blue-score {
       -webkit-transform: rotate(-1deg);
       -moz-transform: rotate(-1deg);
+      border: 1px solid #2980b9;
+      box-shadow: #2980b9 3px 3px 0px;
       left: -200;
-      top: 37%;
     }
     #yellow-score {
       -webkit-transform: rotate(1deg);
       -moz-transform: rotate(1deg);
+      border: 1px solid #f39c12;
+      box-shadow: #f39c12 3px 3px 0px;
       right: -200;
-      top: 37%;
     }
+    .notes {
+      position: absolute;
+      bottom: -50;
+      left: 30%;
+      width: 40%;
+      margin: 0;
+      display: block;
+      border: none;
+      border-bottom: 1px solid #AAA;
+      padding: 10px 0;
+      transition: all 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+      color: #777777;
+      font-size:16px;
+    }
+    .notes:focus {
+      box-shadow: none;
+      outline: none;
+      background-position: 0 0;
+      border-bottom: 3px solid #AAA;
+    }
+    .notes:focus::-webkit-input-placeholder {
+      color: #AAA;
+      font-size: 11px;
+      transform: translateY(-20px);
+      visibility: visible !important;
+    }
+  }
   </style>
 </head>    
 
@@ -504,6 +540,7 @@
         <span id="versus">VS</span>
         <button type="button" class="btn btn-secondary btn-lg" id="reset-submit" onclick="location.reload();"><i class="fa fa-repeat" aria-hidden="true"></i> Reset</button>
         <button  type="submit" class="btn btn-secondary btn-lg" id="form-submit" onclick="submitData(); this.disabled = true; $(this).html = 'Submitted';">Submit</button>
+        <input class="notes" id="notes" name="notes" placeholder="Notes"/>
 
       <div class="col-md-6 yellow">
         <span id="yellow-team"><h1>Team Yellow</h1></span>
@@ -534,15 +571,15 @@
 
         </div>
       </div>
-          <input class="score" id="blue-score" size="2" name="q1">
-          <input class="score" id="yellow-score" size="2" name="q2">
+          <input class="score" id="blue-score" size="2" name="q1" />
+          <input class="score" id="yellow-score" size="2" name="q2" />
       </form>
 
       <iframe src="#" id="no-target" name="no-target" style="display:none;"></iframe>
 
     </div>
   </div>
-  </script>-->
+  </script>
 
 </body>
 </html>
