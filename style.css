@@ -6,15 +6,12 @@ body {
     display: flex;
     overflow: hidden;
 }
-@media (min-width: 1200px){
-    .container {
-        width: 1700px;
-    }
-}
+
 .container {
     margin: auto; 
 }
-h1, h3 {
+
+.container h1, .container h3 {
     font-family: 'Changa One', cursive;
     font-style: italic;
     text-transform: uppercase;
@@ -22,7 +19,8 @@ h1, h3 {
     position: relative;
     letter-spacing: -2px;
 }
-h1 {
+
+.container h1 {
     font-size: 5vw;
     text-align: center;
 }
@@ -33,6 +31,7 @@ h1 {
     position: relative;
     right: 50vw;
 }
+
 .yellow #yellow-team,
 .yellow-attack,
 .yellow-defense {
@@ -62,14 +61,14 @@ h1 {
     box-shadow: #2980b9 3px 3px 0px;
 }
 
-.alert {
+.container .alert {
     position: absolute;
     margin: 2em;
     left: 1em;
     width: 35%;
 }
 
-.btn {
+.container .btn {
     width: 20%;
     margin: 0 auto;
     position: relative;
@@ -80,28 +79,36 @@ h1 {
     font-size: 14pt;
 }
 
-.btn > span {
+.container .btn > span {
     display: none;
     float: left;
     margin-top: 0.3em;
     font-size: 10pt;
 }
 
-.btn:hover, .btn.active, .btn:active {
-    background-color: #444;
-    color: #FFF;
+.container .btn:hover, 
+.container .btn.active, 
+.container .btn:active {
+    background-color: #fdfdfd;
 }
 
-.btn.active, .btn:active {
-    box-shadow: 0 2px 2px rgba(0,0,0,.125)
+.container .btn.active, 
+.container .btn:active {
+    box-shadow: 0 1px 1px rgba(0,0,0,.1);
 }
 
-.btn.active > span, 
-.btn:active > span {
+.container .btn.active > span, 
+.container .btn:active > span {
     display: inline-block;
+    color: #27ae60;
 }
 
-.btn.active.focus, .btn.active:focus, .btn.focus, .btn:active.focus, .btn:active:focus, .btn:focus {
+.container .btn.active.focus, 
+.container .btn.active:focus, 
+.container .btn.focus, 
+.container .btn:active.focus, 
+.container .btn:active:focus, 
+.container .btn:focus {
     outline: none;
 }
 
@@ -112,10 +119,6 @@ h1 {
 #game {
     justify-content: center;
     font-size: 3vw;
-}
-
-.row span {
-    position: relative;
 }
 
 .player h3 {
@@ -187,12 +190,7 @@ span.player-rating {
     letter-spacing: -1px;
     z-index: 1000;
 }
-@media (min-width: 1200px) 
-{
-    .container {
-    width: 1600px;
-    }
-}
+
 .cover {
     background-color: #FFF;
     width: 100%;
@@ -200,6 +198,7 @@ span.player-rating {
     position: absolute;
     z-index: 10000;
 }
+
 #versus {
     position: absolute;
     background: #444;
@@ -210,16 +209,19 @@ span.player-rating {
     padding: 0 15px;
     color: #FFF;
 }
+
 #reset-submit {
     position: absolute;
     left: 30%;
     bottom: -50;
 }
+
 #form-submit {
     position: absolute;
     right: 30%;
     bottom: -50;
 }
+
 .score {
     text-align: center;
     border: 1px solid #555;
@@ -242,6 +244,7 @@ span.player-rating {
     box-shadow: #2980b9 3px 3px 0px;
     left: -200;
 }
+
 #yellow-score {
     transform: rotate(1deg);
     -webkit-transform: rotate(1deg);
@@ -250,6 +253,7 @@ span.player-rating {
     box-shadow: #f39c12 3px 3px 0px;
     right: -200;
 }
+
 .notes {
     position: absolute;
     bottom: -50;
@@ -264,12 +268,14 @@ span.player-rating {
     color: #777777;
     font-size:16px;
 }
+
 .notes:focus {
     box-shadow: none;
     outline: none;
     background-position: 0 0;
     border-bottom: 3px solid #AAA;
 }
+
 .notes:focus::-webkit-input-placeholder {
     color: #AAA;
     font-size: 11px;

@@ -44,6 +44,7 @@ function play()
     {
       $('.alert').remove();
       // Set players and positions
+      checked = shuffle(checked);
       players = pickPlayers(checked)
       $('#preGame').fadeOut('slow', renderGame);
     }
@@ -64,6 +65,22 @@ function pickPlayers(checked)
   }
 
   return chosenPlayers;  
+}
+
+function shuffle(array) {
+  var i = array.length;
+  var temp; 
+  var random;
+
+  while (0 !== i) {
+    random = Math.floor(Math.random() * i);
+    i -= 1;
+    temp = array[i];
+    array[i] = array[random];
+    array[random] = temp;
+  }
+
+  return array;
 }
 
 function renderGame()
@@ -141,8 +158,8 @@ function calculateStakes(bRating, yRating)
   $('#form-submit').delay(5000).animate({bottom: '0'}, { duration: 'slow', easing: 'easeInOutCirc' });
   $('#notes').delay(6000).animate({bottom: '6%'}, { duration: 'slow', easing: 'easeInOutCirc' });
   
-  $('#blue-score').delay(7000).animate({left: '1.5%'}, { duration: 'slow', easing: 'easeInOutCirc' });
-  $('#yellow-score').delay(7000).animate({right: '1.5%'}, { duration: 'slow', easing: 'easeInOutCirc' });
+  $('#blue-score').delay(7000).animate({left: '0.5%'}, { duration: 'slow', easing: 'easeInOutCirc' });
+  $('#yellow-score').delay(7000).animate({right: '0.5%'}, { duration: 'slow', easing: 'easeInOutCirc' });
 }
 
 function renderCount(field, newValue) {
