@@ -1,8 +1,8 @@
 var FoosBot = require('./lib/foosbot');
-var token = 'xoxb-151251381220-YTB4ZIyCP3ZTZEHO4kWuSxQT';
+var config = require('foosbot_config.js');
 
 var iFoosbot = new FoosBot({
-    token: token,
+    token: config.token,
     name: 'FoosBot'
 });
 
