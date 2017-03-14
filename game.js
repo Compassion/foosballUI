@@ -1,4 +1,5 @@
-var ratings;
+var attackRatings;
+var defenseRatings;
 var players = [];
 var count = {
     useEasing : true,
@@ -15,12 +16,17 @@ function init() {
 }
 
 function showPlayerOptions(data, tabletop) {
-  ratings = data[0];
-  delete ratings['Metric'];
-  delete ratings['Submetric'];
-  delete ratings['Side of Champions'];
+  attackRatings = data[1];
+  defenseRatings = data[2];
+  
+  delete attackRatings['Metric'];
+  delete attackRatings['Submetric'];
+  delete attackRatings['Side of Champions'];
+  delete defenseRatings['Metric'];
+  delete defenseRatings['Submetric'];
+  delete defenseRatings['Side of Champions'];
 
-  for(key in ratings){
+  for(key in attackRatings){
     $('#selector').append('<label class="btn players btn-outline-primary"><span class="glyphicon glyphicon-ok"></span><input type="checkbox" value="'+ key +'">'+ key +'</label>');
     $('#preGame').fadeIn(800);
   }
@@ -90,16 +96,16 @@ function renderGame()
     var yAttack = players[2];
     var yDefense = players[3];
 
-    var bRating = Math.round(( parseInt(ratings[bAttack]) + parseInt(ratings[bDefense]) ) / 2);
-    var yRating = Math.round(( parseInt(ratings[yAttack]) + parseInt(ratings[yDefense]) ) / 2);
+    var bRating = Math.round(( parseInt(attackRatings[bAttack]) + parseInt(defenseRatings[bDefense]) ) / 2);
+    var yRating = Math.round(( parseInt(attackRatings[yAttack]) + parseInt(defenseRatings[yDefense]) ) / 2);
     
     // Setup element content
-    $('#blue-attack-rating').html(ratings[bAttack]);
-    $('#blue-defense-rating').html(ratings[bDefense]);
+    $('#blue-attack-rating').html(attackRatings[bAttack]);
+    $('#blue-defense-rating').html(defenseRatings[bDefense]);
     $('#blue-attack').html("<h3>" + bAttack + "</h3>");
     $('#blue-defense').html("<h3>" + bDefense + "</h3>");
-    $('#yellow-attack-rating').html(ratings[yAttack]);
-    $('#yellow-defense-rating').html(ratings[yDefense]);
+    $('#yellow-attack-rating').html(attackRatings[yAttack]);
+    $('#yellow-defense-rating').html(defenseRatings[yDefense]);
     $('#yellow-attack').html("<h3>" + yAttack + "</h3>");
     $('#yellow-defense').html("<h3>" + yDefense + "</h3>");
 
