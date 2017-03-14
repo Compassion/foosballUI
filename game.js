@@ -27,7 +27,7 @@ function showPlayerOptions(data, tabletop) {
   delete defenseRatings['Side of Champions'];
 
   for(key in attackRatings){
-    $('#selector').append('<label class="btn players btn-outline-primary"><span class="glyphicon glyphicon-ok"></span><input type="checkbox" value="'+ key +'">'+ key +'</label>');
+    $('#selector').append('<label class="btn players btn-outline-primary"><span class="glyphicon glyphicon-ok"></span><input type="checkbox" id="'+ key +'" value="'+ key +'">'+ key +'</label>');
     $('#preGame').fadeIn(800);
   }
 }
@@ -51,7 +51,7 @@ function play()
       $('.alert').remove();
       // Set players and positions
       checked = shuffle(checked);
-      players = pickPlayers(checked)
+      players = pickPlayers(checked);
       $('#preGame').fadeOut('slow', renderGame);
     }
 }

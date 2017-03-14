@@ -6,11 +6,30 @@ var fs = require('fs');
 var Bot = require('slackbots');
 var http = require('http');
 var io = require('socket.io');
+var fs = require('fs');
 
 var server = http.createServer();
     server.listen(8000);
 var socket = io.listen(server);
 var configChannel = 'foosball';
+
+var timerStarted = false;
+var players = [];
+
+var userMap = new Map();
+  map.set("U02DXHA8Q","Alecia");
+  map.set("U02DWKVSD","Brentan");
+  map.set("U02DXGZKJ","Chris");
+  map.set("U2MP4P3C1","Danny");
+  map.set("U02G7G6EQ","Erik");
+  map.set("U3R4W0VAR","Joel");
+  map.set("U02D31X9V","Josh");
+  map.set("U02D3247T","Jon");
+  map.set("U02EE639P","Lucas");
+  map.set("U02D3291H","Matt");
+  map.set("U1HBGH8P9","Mark");
+  map.set("U1Z1H4GMR","Russell");
+  map.set("U02DWU1V7","Simon");
 
 var FoosBot = function Constructor(settings) {
     this.settings = settings;
@@ -39,21 +58,58 @@ FoosBot.prototype._onMessage = function (message) {
     if (this._isChatMessage(message)) {
         if (this._isChannelConversation(message) &&
             !this._isFromFoosBot(message) &&
-            this._isMentioningFoosball(message) &&
             this._isFoosballChannel(message.channel)) 
         {
-        console.log('Message valid.');
-        this._announceGame(message);
+            if (this._isMentioningFoosball(message)){
+                this._initiateGame(message.user);
+            }
+            if (this._isJoinGameMessage(message)){
+                this._addToGame(message.user);
+            }
         }
     } 
         
 };
 
-FoosBot.prototype._announceGame = function (originalMessage) {
+FoosBot.prototype._initiateGame = function (user) {
     var self = this;
-    self.postMessageToChannel(configChannel, 'It\'s time to foos!', {as_user: true});
-    socket.emit('message', 'NEWGAME');
+    
+    if (!timerStarted) {
+        timerStarted = true;
+        setTimeout( _newGame, 60000 );
+        self.postMessageToChannel(configChannel, 'It\'s time to foos! Send \'!\' in the next minute to join the potential players...', {as_user: true});
+        socket.emit('message', 'COUNTDOWN');
+    }
+
+    self._addToGame(user);
+
 };
+
+FoosBot.prototype._addToGame = function(user){
+    var userName = userMap.get(user);
+    if (timerStarted) {
+        if (!players.includes(userName)) {
+            players.push(userName);
+            self.postMessageToChannel(configChannel, userName + ' wants to play.', {as_user: true});
+            socket.emit('newplayer', userName);
+        }
+    }
+    if (!timerStarted) {
+        self.postMessageToChannel(configChannel, 'There\'s no game to join ' + userName + ' :(', {as_user: true});
+    }
+}
+
+FoosBot.prototype._newGame = function(){
+
+    if (players.length < 4) {
+        self.postMessageToChannel(configChannel, 'Not enough interested players for a full game. :(', {as_user: true});
+    } else {
+        self.postMessageToChannel(configChannel, 'Starting game with ' + players.join(', ') + '. Good luck!', {as_user: true});
+        socket.emit('message', 'START');
+    }
+
+    timerStarted = false;
+}
 
 FoosBot.prototype._loadBotUser = function () {
     var self = this;
@@ -63,8 +119,7 @@ FoosBot.prototype._loadBotUser = function () {
 };
 
 FoosBot.prototype._welcomeMessage = function () {
-    this.postMessageToChannel(configChannel, 'Hey, I am Foosbot. If you mention foosball I will start a game up.',
-        {as_user: true});
+    //this.postMessageToChannel(configChannel, 'Hey, I am Foosbot. If you mention foosball I will start a game up.', {as_user: true});   
 };
 
 FoosBot.prototype._isChatMessage = function (message) {
@@ -89,6 +144,11 @@ FoosBot.prototype._isMentioningFoosball = function (message) {
     var isMentioningFoosball = message.text.toLowerCase().indexOf('foosball') > -1 || message.text.toLowerCase().indexOf(this.name.toLowerCase()) > -1;
     //console.log('Is mentioning foosball or FoosBot?', isMentioningFoosball);
     return isMentioningFoosball;
+};
+
+FoosBot.prototype._isJoinGameMessage = function (message) {
+    var isJoinGameMessage = message.text.toLowerCase().indexOf('!') > -1 || message.text.length() == 1;
+    return isJoinGameMessage;
 };
 
 FoosBot.prototype._isFoosballChannel = function (channel) {
