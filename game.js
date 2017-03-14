@@ -8,6 +8,7 @@ var count = {
 
 var bAnimate = {right: '0'};
 var yAnimate = {left: '0'};
+var gamePlayed = false;
 
 function init() {
   Tabletop.init( { key: 'https://docs.google.com/spreadsheets/d/18Z8ngS2h9iYyk80lxLyiN5tiih__RUL5KKhal-Z6fsw/pubhtml?gid=1440610671&single=true',
@@ -32,7 +33,7 @@ function showPlayerOptions(data, tabletop) {
   }
 }
 
-function play()
+function play(source)
 {
     // Get checked options
     var checked = [];
@@ -52,7 +53,12 @@ function play()
       // Set players and positions
       checked = shuffle(checked);
       players = pickPlayers(checked);
-      $('#preGame').fadeOut('slow', renderGame);
+
+      if(source == 'main')
+        $('#preGame').fadeOut('slow', renderGame);
+
+      if(source == 'slack') 
+        $('#countdown').fadeOut('slow', renderGame);
     }
 }
 
@@ -91,6 +97,8 @@ function shuffle(array) {
 
 function renderGame()
 {
+    gamePlayed = true;
+
     var bAttack = players[0];
     var bDefense = players[1];
     var yAttack = players[2];

@@ -15,6 +15,7 @@ var configChannel = 'foosball';
 
 var timerStarted = false;
 var players = [];
+var currentUser;
 
 var userMap = new Map();
   map.set("U02DXHA8Q","Alecia");
@@ -45,6 +46,7 @@ FoosBot.prototype.run = function () {
 
     this.on('start', this._onStart);
     this.on('message', this._onMessage);
+    this.on('game', this._onGameMessage);
 };
 
 FoosBot.prototype._onStart = function () {
@@ -53,7 +55,7 @@ FoosBot.prototype._onStart = function () {
     this._welcomeMessage();
 };
 
-FoosBot.prototype._onMessage = function (message) {
+FoosBot.prototype._onMessage = function(message) {
     console.log('Checking message: ', message.text);
     if (this._isChatMessage(message)) {
         if (this._isChannelConversation(message) &&
@@ -71,21 +73,28 @@ FoosBot.prototype._onMessage = function (message) {
         
 };
 
-FoosBot.prototype._initiateGame = function (user) {
-    var self = this;
-    
-    if (!timerStarted) {
+FoosBot.prototype._onGameMessage = function(message) {
+    console.log('Checking message: ', message.text);
+    if (message == 'SUCCESS') {
         timerStarted = true;
         setTimeout( _newGame, 60000 );
         self.postMessageToChannel(configChannel, 'It\'s time to foos! Send \'!\' in the next minute to join the potential players...', {as_user: true});
+        self._addToGame(currentUser);
+    } else if (message == 'ERROR') {
+        self.postMessageToChannel(configChannel, 'Foosball UI needs to be refreshed first. Try again shortly.', {as_user: true});
+    }
+        
+};
+FoosBot.prototype._initiateGame = function(user) {
+    var self = this;
+    currentUser = user;
+    
+    if (!timerStarted) {
         socket.emit('message', 'COUNTDOWN');
     }
-
-    self._addToGame(user);
-
 };
 
-FoosBot.prototype._addToGame = function(user){
+FoosBot.prototype._addToGame = function(user) {
     var userName = userMap.get(user);
     if (timerStarted) {
         if (!players.includes(userName)) {
@@ -99,7 +108,7 @@ FoosBot.prototype._addToGame = function(user){
     }
 }
 
-FoosBot.prototype._newGame = function(){
+FoosBot.prototype._newGame = function() {
 
     if (players.length < 4) {
         self.postMessageToChannel(configChannel, 'Not enough interested players for a full game. :(', {as_user: true});

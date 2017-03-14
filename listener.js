@@ -1,19 +1,23 @@
 // This is the stuff that listens to the FoosBot Node app
 
-//var socket = io.connect('http://localhost:8000');
+var socket = io.connect('http://localhost:8000');
 
 socket.on('message', function(data){
     if(data = 'COUNTDOWN') {
+        if (gamePlayed){
+            location.reload();
+            socket.emit('game','ERROR');
+        }
+
+        socket.emit('game','SUCCESS');
         renderCountChart('#countdown-chart', '#333', 60000);
         renderCount(60);
 
         $('#preGame').fadeOut(500);
-        $('#countdown').delay(500).fadeIn(500);
-
-        playSound('attack');
+        $('#countdown').delay(500).fadeIn(500, playSound('attack'));
     }
     if(data = 'START') {
-        play();
+        play('slack');
     }
 });
 
