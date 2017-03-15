@@ -18,19 +18,19 @@ var players = [];
 var currentUser;
 
 var userMap = new Map();
-  map.set("U02DXHA8Q","Alecia");
-  map.set("U02DWKVSD","Brentan");
-  map.set("U02DXGZKJ","Chris");
-  map.set("U2MP4P3C1","Danny");
-  map.set("U02G7G6EQ","Erik");
-  map.set("U3R4W0VAR","Joel");
-  map.set("U02D31X9V","Josh");
-  map.set("U02D3247T","Jon");
-  map.set("U02EE639P","Lucas");
-  map.set("U02D3291H","Matt");
-  map.set("U1HBGH8P9","Mark");
-  map.set("U1Z1H4GMR","Russell");
-  map.set("U02DWU1V7","Simon");
+  userMap.set("U02DXHA8Q","Alecia");
+  userMap.set("U02DWKVSD","Brentan");
+  userMap.set("U02DXGZKJ","Chris");
+  userMap.set("U2MP4P3C1","Danny");
+  userMap.set("U02G7G6EQ","Erik");
+  userMap.set("U3R4W0VAR","Joel");
+  userMap.set("U02D31X9V","Josh");
+  userMap.set("U02D3247T","Jon");
+  userMap.set("U02EE639P","Lucas");
+  userMap.set("U02D3291H","Matt");
+  userMap.set("U1HBGH8P9","Mark");
+  userMap.set("U1Z1H4GMR","Russell");
+  userMap.set("U02DWU1V7","Simon");
 
 var FoosBot = function Constructor(settings) {
     this.settings = settings;
@@ -86,7 +86,6 @@ FoosBot.prototype._onGameMessage = function(message) {
         
 };
 FoosBot.prototype._initiateGame = function(user) {
-    var self = this;
     currentUser = user;
     
     if (!timerStarted) {
@@ -99,12 +98,12 @@ FoosBot.prototype._addToGame = function(user) {
     if (timerStarted) {
         if (!players.includes(userName)) {
             players.push(userName);
-            self.postMessageToChannel(configChannel, userName + ' wants to play.', {as_user: true});
+            this.postMessageToChannel(configChannel, userName + ' wants to play.', {as_user: true});
             socket.emit('newplayer', userName);
         }
     }
     if (!timerStarted) {
-        self.postMessageToChannel(configChannel, 'There\'s no game to join ' + userName + ' :(', {as_user: true});
+        this.postMessageToChannel(configChannel, 'There\'s no game to join ' + userName + ' :(', {as_user: true});
     }
 }
 
@@ -128,7 +127,7 @@ FoosBot.prototype._loadBotUser = function () {
 };
 
 FoosBot.prototype._welcomeMessage = function () {
-    //this.postMessageToChannel(configChannel, 'Hey, I am Foosbot. If you mention foosball I will start a game up.', {as_user: true});   
+    this.postMessageToChannel(configChannel, 'Hey, I am Foosbot. If you mention foosball I will start a game up.', {as_user: true});   
 };
 
 FoosBot.prototype._isChatMessage = function (message) {
@@ -156,7 +155,7 @@ FoosBot.prototype._isMentioningFoosball = function (message) {
 };
 
 FoosBot.prototype._isJoinGameMessage = function (message) {
-    var isJoinGameMessage = message.text.toLowerCase().indexOf('!') > -1 || message.text.length() == 1;
+    var isJoinGameMessage = message.text.toLowerCase().indexOf('!') > -1 || message.text.length == 1;
     return isJoinGameMessage;
 };
 
