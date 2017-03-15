@@ -49,16 +49,17 @@ FoosBot.prototype.run = function () {
 };
 
 FoosBot.prototype._onStart = function () {
+    var self = this;
     console.log('Bot started.');
     this._loadBotUser();
 
-    io.on('connect', function(socket){
-        console.log('Connection established.')
-        this._welcomeMessage();
+    socket.on('connect', function(message) {
+        console.log('Connection established.');
+        self._welcomeMessage();
+    });
 
-        socket.on('game', function(message) {
-            this._onGameMessage(message);
-        });
+    socket.on('game', function(message) {
+        self._onGameMessage(message);
     });
 };
 
@@ -105,6 +106,7 @@ FoosBot.prototype._initiateGame = function(user) {
 
 FoosBot.prototype._addToGame = function(user) {
     var userName = userMap.get(user);
+
     if (timerStarted) {
         if (!players.includes(userName)) {
             players.push(userName);

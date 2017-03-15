@@ -2,8 +2,13 @@
 
 var socket = io.connect('http://localhost:8000');
 
-socket.on('message', function(data){
-    if(data == 'CHECK') {
+socket.on('connect', function() {
+    console.log('Sending connection message');
+    socket.emit('connected','SUCCESS');
+});
+
+socket.on('message', function(message){
+    if(message == 'CHECK') {
         if (gamePlayed){
             location.reload();
             socket.emit('game','ERROR');
@@ -12,19 +17,18 @@ socket.on('message', function(data){
             socket.emit('game','SUCCESS');
         }
     }
-    if(data == 'COUNTDOWN') {
+    if(message == 'COUNTDOWN') {
         initiateGame();
     }
-    if(data == 'START') {
+    if(message == 'START') {
         play('slack');
     }
 });
 
-socket.on('newplayer', function(data){
-    document.getElementById(data).checked = true;
-    $('#countdown-players').append('<label class="btn active players btn-outline-primary"><span class="glyphicon glyphicon-ok"></span><input type="checkbox" checked>'+ data +'</label>');
+socket.on('newplayer', function(message){
+    document.getElementById(message).checked = true;
+    $('#countdown-players').append('<label class="btn active players btn-outline-primary"><span class="glyphicon glyphicon-ok"></span><input type="checkbox" checked>'+ message +'</label>');
 });
-
 
 function initiateGame(){
     renderCountChart('#countdown-chart', '#333', 60000);
