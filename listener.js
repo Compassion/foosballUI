@@ -3,20 +3,19 @@
 var socket = io.connect('http://localhost:8000');
 
 socket.on('message', function(data){
-    if(data = 'COUNTDOWN') {
+    if(data == 'CHECK') {
         if (gamePlayed){
             location.reload();
             socket.emit('game','ERROR');
         }
-
-        socket.emit('game','SUCCESS');
-        renderCountChart('#countdown-chart', '#333', 60000);
-        renderCount(60);
-
-        $('#preGame').fadeOut(500);
-        $('#countdown').delay(500).fadeIn(500, playSound('attack'));
+        else {
+            socket.emit('game','SUCCESS');
+        }
     }
-    if(data = 'START') {
+    if(data == 'COUNTDOWN') {
+        initiateGame();
+    }
+    if(data == 'START') {
         play('slack');
     }
 });
@@ -26,6 +25,14 @@ socket.on('newplayer', function(data){
     $('#countdown-players').append('<label class="btn active players btn-outline-primary"><span class="glyphicon glyphicon-ok"></span><input type="checkbox" checked>'+ data +'</label>');
 });
 
+
+function initiateGame(){
+    renderCountChart('#countdown-chart', '#333', 60000);
+    renderCountdown(60);
+
+    $('#preGame').fadeOut(500);
+    $('#countdown').delay(500).fadeIn(500, playSound('attack'));
+}
 
 function renderCountChart(container, colour, time) {
   var bar = new ProgressBar.Circle(container, {
@@ -40,6 +47,6 @@ function renderCountChart(container, colour, time) {
   bar.animate(0);
 }
 
-function renderCount(value) {
+function renderCountdown(value) {
     new CountUp('countdown-value', value, 0, 0, 60, { useEasing : false, useGrouping : true }).start();
 }

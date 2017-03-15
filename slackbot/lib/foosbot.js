@@ -46,14 +46,22 @@ FoosBot.prototype.run = function () {
 
     this.on('start', this._onStart);
     this.on('message', this._onMessage);
-    this.on('game', this._onGameMessage);
 };
 
 FoosBot.prototype._onStart = function () {
     console.log('Bot started.');
     this._loadBotUser();
-    this._welcomeMessage();
+
+    io.on('connect', function(socket){
+        console.log('Connection established.')
+        this._welcomeMessage();
+
+        socket.on('game', function(message) {
+            this._onGameMessage(message);
+        });
+    });
 };
+
 
 FoosBot.prototype._onMessage = function(message) {
     console.log('Checking message: ', message.text);
@@ -74,13 +82,15 @@ FoosBot.prototype._onMessage = function(message) {
 };
 
 FoosBot.prototype._onGameMessage = function(message) {
-    console.log('Checking message: ', message.text);
     if (message == 'SUCCESS') {
         timerStarted = true;
+        socket.emit('message', 'COUNTDOWN');
+
         setTimeout( _newGame, 60000 );
         self.postMessageToChannel(configChannel, 'It\'s time to foos! Send \'!\' in the next minute to join the potential players...', {as_user: true});
         self._addToGame(currentUser);
-    } else if (message == 'ERROR') {
+    } 
+    else if (message == 'ERROR') {
         self.postMessageToChannel(configChannel, 'Foosball UI needs to be refreshed first. Try again shortly.', {as_user: true});
     }
         
@@ -89,7 +99,7 @@ FoosBot.prototype._initiateGame = function(user) {
     currentUser = user;
     
     if (!timerStarted) {
-        socket.emit('message', 'COUNTDOWN');
+        socket.emit('message', 'CHECK');
     }
 };
 
