@@ -1,32 +1,38 @@
 // This is the stuff that listens to the FoosBot Node app
 
-var socket = io.connect('http://localhost:8000');
+var socket = io('http://localhost:8000');
 
 socket.on('connect', function() {
     console.log('Sending connection message');
-    socket.emit('connected','SUCCESS');
 });
 
-socket.on('message', function(message){
-    if(message == 'CHECK') {
+socket.on('message', function(data){
+    console.log('Recieved ' + data);
+    if(data == 'CHECK') {
+        console.log('is CHECK');
         if (gamePlayed){
-            location.reload();
-            socket.emit('game','ERROR');
+            socket.emit('message','ERROR');
         }
         else {
-            socket.emit('game','SUCCESS');
+            gamePlayed = true;
+            console.log('Starting game');
+            socket.emit('message','SUCCESS');
         }
+        console.log(gamePlayed);
     }
-    if(message == 'COUNTDOWN') {
+    if(data == 'COUNTDOWN') {
+        console.log('is COUNTDOWN');
         initiateGame();
     }
-    if(message == 'START') {
+    if(data == 'START') {
+        console.log('is START');
         play('slack');
     }
 });
 
-socket.on('newplayer', function(message){
-    document.getElementById(message).checked = true;
+socket.on('newplayer', function(data){
+    console.log('New player: ' + data);
+    document.getElementById(data).checked = true;
     $('#countdown-players').append('<label class="btn active players btn-outline-primary"><span class="glyphicon glyphicon-ok"></span><input type="checkbox" checked>'+ message +'</label>');
 });
 
