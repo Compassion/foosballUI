@@ -135,7 +135,18 @@ function renderGame()
 
 function playSound(soundName)
 {
-  new Audio('audio/' + soundName.toLowerCase() + '.mp3').play();
+  var a = new Audio('audio/' + soundName.toLowerCase() + '.mp3');
+
+  a.onerror = function() {
+    if (soundName.indexOf('attack') > -1)
+      play('attack');
+
+    if (soundName.indexOf('defense') > -1)
+      play('defense');
+  };
+  a.onloadeddata = function() {
+    a.play();
+  };
 }
 
 function calculateStakes(bRating, yRating)
