@@ -18,7 +18,6 @@ var players = [];
 var currentUser;
 
     socket.on('message', function(data) {
-        console.log('test');
         console.log('Receieved game: ', data);
         self._onGameMessage(data);
     });

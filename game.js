@@ -10,13 +10,24 @@ var bAnimate = {right: '0'};
 var yAnimate = {left: '0'};
 var gamePlayed = false;
 
-function init() {
+$( document ).ready(function() {
+  
   Tabletop.init( { key: 'https://docs.google.com/spreadsheets/d/18Z8ngS2h9iYyk80lxLyiN5tiih__RUL5KKhal-Z6fsw/pubhtml?gid=1440610671&single=true',
                   callback: showPlayerOptions,
                   simpleSheet: true } )
-}
+
+  // After submission success, reload page
+  $('no-target').on('load', function() {
+    if (gamePlayed == true) {
+      setTimeout('location.reload()', 5000);
+    }
+  });
+
+});
 
 function showPlayerOptions(data, tabletop) {
+  connectToNode();
+
   attackRatings = data[1];
   defenseRatings = data[2];
   
@@ -240,5 +251,3 @@ function submitData()
   console.log(submitURL);
   document.getElementById('no-target').src = submitURL;
 }
-
-window.addEventListener('DOMContentLoaded', init);
