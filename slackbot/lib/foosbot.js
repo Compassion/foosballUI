@@ -7,7 +7,7 @@ var Bot = require('slackbots');
 var io = require('socket.io').listen(8000);
 var fs = require('fs');
 
-var configChannel = 'sandbox';
+var configChannel = 'foosball';
 var timerStarted = false;
 var players = [];
 var currentUser;

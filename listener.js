@@ -62,5 +62,5 @@ function renderCountChart(container, colour, time) {
 };
 
 function renderCountdown(value) {
-    new CountUp('countdown-value', value, 0, 0, 58, { useEasing : false, useGrouping : true }).start();
+    new CountUp('countdown-value', value, 0, 0, 60, { useEasing : false, useGrouping : true }).start();
 };
