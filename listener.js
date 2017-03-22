@@ -7,24 +7,26 @@ function connectToNode() {
         console.log('Sending connection message');
     });
 
-    socket.on('message', function(data){
-        console.log('Recieved ' + data);
-        if(data == 'CHECK') {
-            console.log('is CHECK');
+    socket.on('message', function(data) {
+
+        console.log('Received ' + data);
+        
+        if(data == 'CHECK') {            
             if (gamePlayed){
-                socket.emit('message','ERROR');
+                socket.send('ERROR');
             }
             else {
                 gamePlayed = true;
                 console.log('Starting game');
-                socket.emit('message','SUCCESS');
+                socket.send('SUCCESS');
             }
-            console.log(gamePlayed);
         }
+
         if(data == 'COUNTDOWN') {
             console.log('is COUNTDOWN');
             initiateGame();
         }
+
         if(data == 'START') {
             console.log('is START');
             play('slack');

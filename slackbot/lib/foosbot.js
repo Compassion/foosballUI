@@ -16,11 +16,6 @@ var configChannel = 'sandbox';
 var timerStarted = false;
 var players = [];
 var currentUser;
-
-    socket.on('message', function(data) {
-        console.log('Receieved game: ', data);
-        self._onGameMessage(data);
-    });
     
 var userMap = new Map();
   userMap.set("U02DXHA8Q","Alecia");
@@ -64,6 +59,10 @@ FoosBot.prototype._onStart = function () {
         self._welcomeMessage();
     });
 
+    socket.on('message', function(message) {
+        console.log('Receieved game: ', message);
+        self._onGameMessage(message);
+    });
 };
 
 FoosBot.prototype._onMessage = function(message) {
@@ -93,10 +92,11 @@ FoosBot.prototype._onGameMessage = function(message) {
     } 
     else if (message == 'ERROR') {
         console.log('Game already started.');
-        self.postMessageToChannel(configChannel, 'Foosball UI needs to be refreshed first. Try again shortly.', {as_user: true});
+        self.postMessageToChannel(configChannel, 'Foosball UI needs to be refreshed first. Please refresh and try again.', {as_user: true});
     }
         
 };
+
 FoosBot.prototype._initiateGame = function(user) {
     console.log(user + ' started game. Game already started: ', timerStarted);
     currentUser = user;
