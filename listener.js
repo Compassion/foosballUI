@@ -17,19 +17,21 @@ function connectToNode() {
             }
             else {
                 gamePlayed = true;
-                console.log('Starting game');
+                console.log('Starting game lobby');
                 socket.send('SUCCESS');
             }
         }
 
         if(data == 'COUNTDOWN') {
-            console.log('is COUNTDOWN');
             initiateGame();
         }
 
         if(data == 'START') {
-            console.log('is START');
             play('slack');
+        }
+
+        if(data == 'RELOAD') {
+            location.reload();
         }
     });
 

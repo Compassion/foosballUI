@@ -126,11 +126,13 @@ FoosBot.prototype._newGame = function() {
 
     if (players.length < 4) {
         self.postMessageToChannel(configChannel, 'Not enough interested players for a full game. :(', {as_user: true});
+        socket.emit('message', 'RELOAD');
     } else {
         self.postMessageToChannel(configChannel, 'Starting game with ' + players.join(', ') + '. Good luck!', {as_user: true});
         socket.emit('message', 'START');
     }
 
+    players = [];
     timerStarted = false;
 }
 
