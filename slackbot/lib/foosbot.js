@@ -4,15 +4,10 @@ var util = require('util');
 var path = require('path');
 var fs = require('fs');
 var Bot = require('slackbots');
-var http = require('http');
-var io = require('socket.io');
+var io = require('socket.io').listen(8000);
 var fs = require('fs');
 
-var server = http.createServer();
-    server.listen(8000);
-var socket = io.listen(server);
 var configChannel = 'sandbox';
-
 var timerStarted = false;
 var players = [];
 var currentUser;
@@ -51,18 +46,18 @@ FoosBot.prototype.run = function () {
 FoosBot.prototype._onStart = function () {
     var self = this;
 
-    console.log('Bot started.');
-    self._loadBotUser();
-
-    socket.on('connect', function() {
+    io.sockets.on('connect', function (socket) {
         console.log('Connection established.');
-        self._welcomeMessage();
+
+        socket.on('message', function(message) {
+            console.log('Received game confirmation: ', message);
+            self._onGameMessage(message);
+        });
     });
 
-    socket.on('message', function(message) {
-        console.log('Receieved game: ', message);
-        self._onGameMessage(message);
-    });
+    console.log('Bot started.');
+    self.postMessageToChannel(configChannel, 'Hey, I am Foosbot. If you mention foosball I will start a game up.', {as_user: true});
+    self._loadBotUser();   
 };
 
 FoosBot.prototype._onMessage = function(message) {
@@ -81,14 +76,19 @@ FoosBot.prototype._onMessage = function(message) {
 };
 
 FoosBot.prototype._onGameMessage = function(message) {
+    var self = this;
+
     if (message == 'SUCCESS') {
         console.log('Game starting...');
         timerStarted = true;
-        socket.emit('message', 'COUNTDOWN');
+        io.emit('message', 'COUNTDOWN');
 
-        setTimeout( _newGame, 60000 );
-        self.postMessageToChannel(configChannel, 'It\'s time to foos! Send \'!\' in the next minute to join the potential players...', {as_user: true});
+        self.postMessageToChannel(configChannel, 'It\'s time to foos! Send \'!\' in the next minute to join the game.', {as_user: true});
         self._addToGame(currentUser);
+
+        setTimeout( function() {
+                        self._newGame();
+                    }, 60000 );
     } 
     else if (message == 'ERROR') {
         console.log('Game already started.');
@@ -103,32 +103,38 @@ FoosBot.prototype._initiateGame = function(user) {
     
     if (timerStarted == false) {
     console.log('Sending CHECK');
-        socket.emit('message', 'CHECK');
+        io.emit('message', 'CHECK');
     }
 };
 
 FoosBot.prototype._addToGame = function(user) {
+    var self = this;
+
     var userName = userMap.get(user);
 
     if (timerStarted) {
-        if (!players.includes(userName)) {
+        if (players.includes(userName)) {
+            self.postMessageToChannel(configChannel, 'You\'re already playing, ' + userName + '.', {as_user: true});
+        } 
+        else if (!players.includes(userName)) {
             players.push(userName);
-            this.postMessageToChannel(configChannel, userName + ' wants to play.', {as_user: true});
-            socket.emit('newplayer', userName);
+            self.postMessageToChannel(configChannel, userName + ' joins the game.', {as_user: true});
+            io.emit('newplayer', userName);
         }
     }
     if (!timerStarted) {
-        this.postMessageToChannel(configChannel, 'There\'s no game to join ' + userName + ' :(', {as_user: true});
+        self.postMessageToChannel(configChannel, 'There\'s no game to join ' + userName + ' :(', {as_user: true});
     }
 }
 
 FoosBot.prototype._newGame = function() {
+    var self = this;
 
     if (players.length < 4) {
         self.postMessageToChannel(configChannel, 'Not enough interested players for a full game. :(', {as_user: true});
     } else {
-        self.postMessageToChannel(configChannel, 'Starting game with ' + players.join(', ') + '. Good luck!', {as_user: true});
-        socket.emit('message', 'START');
+        self.postMessageToChannel(configChannel, 'Starting game with: ' + players.join(', ') + '. Good luck!', {as_user: true});
+        io.emit('message', 'START');
     }
 
     timerStarted = false;
@@ -136,13 +142,10 @@ FoosBot.prototype._newGame = function() {
 
 FoosBot.prototype._loadBotUser = function () {
     var self = this;
+
     this.user = this.users.filter(function (user) {
         return user.name === self.name.toLowerCase();
     })[0];
-};
-
-FoosBot.prototype._welcomeMessage = function () {
-    this.postMessageToChannel(configChannel, 'Hey, I am Foosbot. If you mention foosball I will start a game up.', {as_user: true});   
 };
 
 FoosBot.prototype._isChatMessage = function (message) {
@@ -170,13 +173,12 @@ FoosBot.prototype._isMentioningFoosball = function (message) {
 };
 
 FoosBot.prototype._isJoinGameMessage = function (message) {
-    var isJoinGameMessage = message.text.toLowerCase().indexOf('!') > -1 && message.text.length == 1;
+    var isJoinGameMessage = message.text.indexOf('!') > -1 && message.text.length == 1;
     return isJoinGameMessage;
 };
 
 FoosBot.prototype._isFoosballChannel = function (channel) {
     var isFoosballChannel = this._getChannelById(channel) == configChannel;
-
     // console.log(this._getChannelById(channel), 'Is foosball channel?', isFoosballChannel);
     return isFoosballChannel;
 };

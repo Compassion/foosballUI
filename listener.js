@@ -8,8 +8,6 @@ function connectToNode() {
     });
 
     socket.on('message', function(data) {
-
-        console.log('Received ' + data);
         
         if(data == 'CHECK') {            
             if (gamePlayed){
@@ -23,12 +21,10 @@ function connectToNode() {
         }
 
         if(data == 'COUNTDOWN') {
-            console.log('is COUNTDOWN');
             initiateGame();
         }
 
         if(data == 'START') {
-            console.log('is START');
             play('slack');
         }
     });
@@ -36,7 +32,7 @@ function connectToNode() {
     socket.on('newplayer', function(data){
         console.log('New player: ' + data);
         document.getElementById(data).checked = true;
-        $('#countdown-players').append('<label class="btn active players btn-outline-primary"><span class="glyphicon glyphicon-ok"></span><input type="checkbox" checked>'+ message +'</label>');
+        $('#countdown-players').append('<label class="btn active players btn-outline-primary"><span class="glyphicon glyphicon-ok"></span><input type="checkbox" checked>'+ data +'</label>');
     });
 };
 
@@ -62,5 +58,5 @@ function renderCountChart(container, colour, time) {
 };
 
 function renderCountdown(value) {
-    new CountUp('countdown-value', value, 0, 0, 60, { useEasing : false, useGrouping : true }).start();
+    new CountUp('countdown-value', value, 0, 0, 58, { useEasing : false, useGrouping : true }).start();
 };
