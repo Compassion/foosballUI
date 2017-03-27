@@ -55,6 +55,8 @@ function play(source)
       $('.alert').remove();
       // Set players and positions
       checked = shuffle(checked);
+      checked = shuffle(checked);
+      checked = shuffle(checked);
       players = pickPlayers(checked);
 
       if(source == 'main')
@@ -130,26 +132,11 @@ function renderGame()
     $('.yellow-defense').delay(11000).animate(yAnimate, { duration: 'fast', easing: 'easeInOutCirc', complete: function() { playSound(players[3]+'-defense') } } );
 
     $('#game').show();
+
     setTimeout(
       function(){
         calculateStakes(bRating, yRating)
-      }, 12000)
-}
-
-function playSound(soundName)
-{
-  var a = new Audio('audio/' + soundName.toLowerCase() + '.mp3');
-
-  a.onerror = function() {
-    if (soundName.indexOf('attack') > -1)
-      play('attack');
-
-    if (soundName.indexOf('defense') > -1)
-      play('defense');
-  };
-  a.onloadeddata = function() {
-    a.play();
-  };
+      }, 12000);
 }
 
 function calculateStakes(bRating, yRating)
@@ -188,6 +175,33 @@ function calculateStakes(bRating, yRating)
   
   $('#blue-score').delay(7000).animate({left: '0.5%'}, { duration: 'slow', easing: 'easeInOutCirc' });
   $('#yellow-score').delay(7000).animate({right: '0.5%'}, { duration: 'slow', easing: 'easeInOutCirc' });
+
+  setTimeout( 
+    function() {
+      var game = {
+        "players" : players,
+        "blueWin" : bPercentage,
+        "yellowWin" : yPercentage
+      }
+      _gameStarted(game);
+    }, 5000
+  );
+}
+
+function playSound(soundName)
+{
+  var a = new Audio('audio/' + soundName.toLowerCase() + '.mp3');
+
+  a.onerror = function() {
+    if (soundName.indexOf('attack') > -1)
+      play('attack');
+
+    if (soundName.indexOf('defense') > -1)
+      play('defense');
+  };
+  a.onloadeddata = function() {
+    a.play();
+  };
 }
 
 function renderCount(field, newValue) {
@@ -211,6 +225,13 @@ function submitData()
   var blueScore = parseInt($('#blue-score').val());
   var yellowScore = parseInt($('#yellow-score').val());
   var winner = (blueScore > yellowScore) ? 'Blue' : 'Yella';
+
+  var result =  {
+                  "blueScore" : blueScore,
+                  "yellowScore" : yellowScore
+                };
+
+  _gameFinished(result);
 
   var q1ID = "entry.247460283";   // Winner
   var q2ID = "entry.449488357";   // Yellow Score

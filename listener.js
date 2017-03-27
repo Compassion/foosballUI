@@ -15,13 +15,13 @@ function connectToNode() {
             }
             else {
                 gamePlayed = true;
-                console.log('Starting game lobby');
+                console.log('Start game lobby...');
                 socket.send('SUCCESS');
             }
         }
 
         if(data == 'COUNTDOWN') {
-            initiateGame();
+            _initiateLobby();
         }
 
         if(data == 'START') {
@@ -40,12 +40,20 @@ function connectToNode() {
     });
 };
 
-function initiateGame() {
+function _initiateLobby() {
     renderCountChart('#countdown-chart', '#333', 60000);
     renderCountdown(60);
 
     $('#preGame').fadeOut(500);
     $('#countdown').delay(500).fadeIn(500, playSound('attack'));
+};
+
+function _gameStarted(game) {
+    socket.emit('GAME', game);
+};
+
+function _gameFinished(result) {
+    socket.emit('RESULT', result);
 };
 
 function renderCountChart(container, colour, time) {
