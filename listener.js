@@ -1,7 +1,8 @@
 // This is the stuff that listens to the FoosBot Node app
+var socket;
 
 function connectToNode() {
-    var socket = io('http://localhost:8000');
+    socket = io('http://localhost:8000');
 
     socket.on('connect', function() {
         console.log('Sending connection message');

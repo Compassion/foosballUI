@@ -5,7 +5,7 @@ var path = require('path');
 var Bot = require('slackbots');
 var io = require('socket.io').listen(8000);
 
-var configChannel = 'foosball';
+var configChannel = 'sandbox';
 var timerStarted = false;
 var betsOpen = false;
 var players = [];
@@ -58,14 +58,14 @@ FoosBot.prototype._onStart = function () {
         socket.on('game', function(data) {
             currentGame = data;
 
-            var blueOdds = (data.blueWin / 1) - 1;
-            var yellowOdds = (data.yellowWin / 1) - 1;
+            var blueOdds = Math.round((1 / data.blueWin) * 100) / 100;
+            var yellowOdds = Math.round((1 / data.yellowWin) * 100) / 100;
 
-            data.push(blueOdds);
-            data.push(yellowOdds);
+            data.blueOdds = blueOdds;
+            data.yellowOdds = yellowOdds;
 
-            self.postMessageToChannel(configChannel, 'Blue Team: ' + players[0] + ' Attack, ' + players[1] + ' Defense (Odds: ' + blueOdds + ':1', {as_user: true});
-            self.postMessageToChannel(configChannel, 'Yellow Team: ' + players[2] + ' Attack, ' + players[3] + ' Defense (Odds: ' + yellowOdds + ':1', {as_user: true});
+            self.postMessageToChannel(configChannel, '*Blue Team:* ' + currentGame.players[0] + ' Attack, ' + currentGame.players[1] + ' Defense (Odds: ' + blueOdds + ':1)', {as_user: true});
+            self.postMessageToChannel(configChannel, '*Yellow Team:* ' + currentGame.players[2] + ' Attack, ' + currentGame.players[3] + ' Defense (Odds: ' + yellowOdds + ':1)', {as_user: true});
             
             betsOpen = true;
             setTimeout( function() {
@@ -79,8 +79,8 @@ FoosBot.prototype._onStart = function () {
             self.postMessageToChannel(configChannel, 'Yellow Team: ' + data.yellowScore, {as_user: true});
 
             var winner = (parseInt(data.blueScore) > parseInt(data.yellowScore)) ? 'Blue' : 'Yellow';
-            var attackWinner = (winner == 'Blue') ? players[0] : players[2];
-            var defenseWinner = (winner == 'Blue') ? players[1] : players[3];
+            var attackWinner = (winner == 'Blue') ? currentGame.players[0] : currentGame.players[2];
+            var defenseWinner = (winner == 'Blue') ? currentGame.players[1] : currentGame.players[3];
 
             self.postMessageToChannel(configChannel, 'Congratulations ' + winner + ' Team, ' + attackWinner + ' and ' + defenseWinner, {as_user: true});
             self._payBetWinners(winner);
@@ -170,14 +170,19 @@ FoosBot.prototype._processBet = function(message) {
     if (parseInt(betMessage[2]) == "NaN") {
         self.postMessageToChannel(configChannel, 'Sorry, ' + userName + 'I don\'t understand your bet request. The bet amount should be numbers only.', {as_user: true});
     }
+    if (betsOpen == false) {
+        self.postMessageToChannel(configChannel, 'Sorry, ' + userName + ' - betting is not open right now.', {as_user: true});
+    }
     else {
         if(betMessage[1].toLowerCase() == 'blue') {
             bet.team = 'blue';
-            bet.amount = betMessage[2] * game.blueOdds;
+            bet.amount = betMessage[2];
+            bet.stakes = betMessage[2] * currentGame.blueOdds;
         }
         else if(betMessage[1].toLowerCase() == 'yellow') {
             bet.team = 'yellow';
-            bet.amount = betMessage[2] * game.yellowOdds;
+            bet.amount = betMessage[2];
+            bet.stakes = betMessage[2] * currentGame.yellowOdds;
         }
         else {
             self.postMessageToChannel(configChannel, 'Sorry, ' + userName + 'I don\'t understand your bet request. The bet amount should be numbers only.', {as_user: true});

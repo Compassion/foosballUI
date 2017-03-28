@@ -183,6 +183,7 @@ function calculateStakes(bRating, yRating)
         "blueWin" : bPercentage,
         "yellowWin" : yPercentage
       }
+      console.log(game);
       _gameStarted(game);
     }, 5000
   );
