@@ -264,10 +264,3 @@ function submitData()
   console.log(submitURL);
   document.getElementById('no-target').src = submitURL;
 }
-
-// After submission success, reload page
-$('#no-target').on('load', function() {
-  if (gamePlayed == true) {
-    setTimeout('location.reload()', 5000);
-  }
-});
