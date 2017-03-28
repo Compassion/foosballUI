@@ -2,10 +2,8 @@
 
 var util = require('util');
 var path = require('path');
-var fs = require('fs');
 var Bot = require('slackbots');
 var io = require('socket.io').listen(8000);
-var fs = require('fs');
 
 var configChannel = 'foosball';
 var timerStarted = false;
@@ -55,7 +53,8 @@ FoosBot.prototype._onStart = function () {
         socket.on('message', function(message) {
             console.log('Received lobby confirmation: ', message);
             self._onGameMessage(message);
-        *
+		});
+        
         socket.on('GAME', function(game) {
             currentGame = game;
 
