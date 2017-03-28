@@ -55,14 +55,14 @@ FoosBot.prototype._onStart = function () {
             self._onGameMessage(message);
 		});
         
-        socket.on('GAME', function(game) {
-            currentGame = game;
+        socket.on('game', function(data) {
+            currentGame = data;
 
-            var blueOdds = (game.blueWin / 1) - 1;
-            var yellowOdds = (game.yellowWin / 1) - 1;
+            var blueOdds = (data.blueWin / 1) - 1;
+            var yellowOdds = (data.yellowWin / 1) - 1;
 
-            game.push(blueOdds);
-            game.push(yellowOdds);
+            data.push(blueOdds);
+            data.push(yellowOdds);
 
             self.postMessageToChannel(configChannel, 'Blue Team: ' + players[0] + ' Attack, ' + players[1] + ' Defense (Odds: ' + blueOdds + ':1', {as_user: true});
             self.postMessageToChannel(configChannel, 'Yellow Team: ' + players[2] + ' Attack, ' + players[3] + ' Defense (Odds: ' + yellowOdds + ':1', {as_user: true});
@@ -74,11 +74,11 @@ FoosBot.prototype._onStart = function () {
             );
         });
 
-        socket.on('RESULT', function(result) {
-            self.postMessageToChannel(configChannel, 'Blue Team: ' + result.blueScore, {as_user: true});
-            self.postMessageToChannel(configChannel, 'Yellow Team: ' + result.yellowScore, {as_user: true});
+        socket.on('result', function(data) {
+            self.postMessageToChannel(configChannel, 'Blue Team: ' + data.blueScore, {as_user: true});
+            self.postMessageToChannel(configChannel, 'Yellow Team: ' + data.yellowScore, {as_user: true});
 
-            var winner = (parseInt(result.blueScore) > parseInt(result.yellowScore)) ? 'Blue' : 'Yellow';
+            var winner = (parseInt(data.blueScore) > parseInt(data.yellowScore)) ? 'Blue' : 'Yellow';
             var attackWinner = (winner == 'Blue') ? players[0] : players[2];
             var defenseWinner = (winner == 'Blue') ? players[1] : players[3];
 

@@ -49,11 +49,11 @@ function _initiateLobby() {
 };
 
 function _gameStarted(game) {
-    socket.emit('GAME', game);
+    socket.emit('game', game);
 };
 
 function _gameFinished(result) {
-    socket.emit('RESULT', result);
+    socket.emit('result', result);
 };
 
 function renderCountChart(container, colour, time) {
