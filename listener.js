@@ -39,6 +39,30 @@ function connectToNode() {
         document.getElementById(data).checked = true;
         $('#countdown-players').append('<label class="btn active players btn-outline-primary"><span class="glyphicon glyphicon-ok"></span><input type="checkbox" checked>'+ data +'</label>');
     });
+
+    socket.on('bets', function(data){
+        console.log(data);
+        for (var i = data.length - 1; i >= 0; i--) {
+            var q1ID = "entry.1590908018";  // Player
+            var q2ID = "entry.362528015";   // Amount
+            var q3ID = "entry.2132436961";  // Team
+            var q4ID = "entry.782513485";   // Outcome
+
+            var value1 = encodeURIComponent(data[i].user);
+            var value2 = encodeURIComponent(data[i].amount);
+            var value3 = encodeURIComponent(data[i].team);
+            var value4 = encodeURIComponent(data[i].stakes);
+
+            var baseURL = 'https://docs.google.com/forms/d/e/1FAIpQLSfv1pA24MZN2ZecNj90LrrgF7TVewkuS-gpGn4BtK5ExZNN2w/formResponse?';
+            var submitRef = 'submit=-7354223680545716510';
+            var submitURL = (baseURL + q1ID + "=" + value1 + "&" + 
+                                      q2ID + "=" + value2 + "&" + 
+                                      q3ID + "=" + value3 + "&" + 
+                                      q4ID + "=" + value4 + "&" + submitRef);
+            console.log(submitURL);
+            document.getElementById('bet-frame').src = submitURL;
+        }
+    });
 };
 
 function _initiateLobby() {

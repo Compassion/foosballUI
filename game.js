@@ -1,5 +1,7 @@
 var attackRatings;
 var defenseRatings;
+var betMoney;
+
 var players = [];
 var count = {
     useEasing : true,
@@ -22,6 +24,7 @@ function showPlayerOptions(data, tabletop) {
 
   attackRatings = data[1];
   defenseRatings = data[2];
+  betMoney = data[3];
   
   delete attackRatings['Metric'];
   delete attackRatings['Submetric'];
@@ -181,7 +184,8 @@ function calculateStakes(bRating, yRating)
       var game = {
         "players" : players,
         "blueWin" : bPercentage,
-        "yellowWin" : yPercentage
+        "yellowWin" : yPercentage,
+        "betMoney" : betMoney
       }
       console.log(game);
       _gameStarted(game);
@@ -195,10 +199,10 @@ function playSound(soundName)
 
   a.onerror = function() {
     if (soundName.indexOf('attack') > -1)
-      play('attack');
+      playSound('attack');
 
     if (soundName.indexOf('defense') > -1)
-      play('defense');
+      playSound('defense');
   };
   a.onloadeddata = function() {
     a.play();
@@ -253,7 +257,7 @@ function submitData()
   var value8 = encodeURIComponent($('#notes').val());
 
   var baseURL = 'https://docs.google.com/forms/d/e/1FAIpQLScY-Gg9_PbdVVIkMYqMpJJwzoy1FVBZhAFdgoIBOmsNh4wdbQ/formResponse?';
-  var submitRef = 'submit=4429263762118249483';
+  var submitRef = 'submit=6247444732683940215';
   var submitURL = (baseURL + q1ID + "=" + value1 + "&" + 
                               q2ID + "=" + value2 + "&" + 
                               q3ID + "=" + value3 + "&" + 
