@@ -190,7 +190,7 @@ FoosBot.prototype._processBet = function(message) {
     if (betsOpen == false) {
         self.postMessageToChannel(configChannel, 'Sorry, ' + userName + ' - betting is not open right now.', {as_user: true});
     } 
-    else if (parseInt(betMessage[2]) == "NaN") {
+    else if (betMessage[2] == null || betMessage[2] == "" || parseInt(betMessage[2]) == "NaN") {
         self.postMessageToChannel(configChannel, 'Sorry, ' + userName + ' - I don\'t understand your bet request. The bet amount should be numbers only.', {as_user: true});
     }
     else if (betMessage[2] > parseInt(userMoney)) {
@@ -203,11 +203,13 @@ FoosBot.prototype._processBet = function(message) {
             bet.team = 'Blue';
             bet.amount = amount;
             bet.stakes = amount * currentGame.blueOdds;
+            betMoney.set(userName, userMoney - amount);
         }
         else if(betMessage[1].toLowerCase() == 'yellow') {
             bet.team = 'Yellow';
             bet.amount = amount;
             bet.stakes = amount * currentGame.yellowOdds;
+            betMoney.set(userName, userMoney - amount);
         }
         else {
             self.postMessageToChannel(configChannel, 'Sorry, ' + userName + 'I don\'t understand your bet request. The bet amount should be numbers only.', {as_user: true});

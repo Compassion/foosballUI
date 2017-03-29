@@ -59,8 +59,12 @@ function connectToNode() {
                                       q2ID + "=" + value2 + "&" + 
                                       q3ID + "=" + value3 + "&" + 
                                       q4ID + "=" + value4 + "&" + submitRef);
-            console.log(submitURL);
-            document.getElementById('bet-frame').src = submitURL;
+
+            setTimeout( 
+                function() {
+                    document.getElementById('bet-frame').src = submitURL;
+                }, 4000*i
+            );
         }
     });
 };
