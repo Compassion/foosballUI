@@ -1,5 +1,6 @@
 // This is the stuff that listens to the FoosBot Node app
 var socket;
+var betsPlaced = 0;
 
 function connectToNode() {
     socket = io('http://localhost:8000');
@@ -41,33 +42,49 @@ function connectToNode() {
     });
 
     socket.on('bets', function(data){
-        console.log(data);
-        for (var i = data.length - 1; i >= 0; i--) {
-            var q1ID = "entry.1590908018";  // Player
-            var q2ID = "entry.362528015";   // Amount
-            var q3ID = "entry.2132436961";  // Team
-            var q4ID = "entry.782513485";   // Outcome
-
-            var value1 = encodeURIComponent(data[i].user);
-            var value2 = encodeURIComponent(data[i].amount);
-            var value3 = encodeURIComponent(data[i].team);
-            var value4 = encodeURIComponent(data[i].stakes);
-
-            var baseURL = 'https://docs.google.com/forms/d/e/1FAIpQLSfv1pA24MZN2ZecNj90LrrgF7TVewkuS-gpGn4BtK5ExZNN2w/formResponse?';
-            var submitRef = 'submit=-7354223680545716510';
-            var submitURL = (baseURL + q1ID + "=" + value1 + "&" + 
-                                      q2ID + "=" + value2 + "&" + 
-                                      q3ID + "=" + value3 + "&" + 
-                                      q4ID + "=" + value4 + "&" + submitRef);
-
-            setTimeout( 
-                function() {
-                    document.getElementById('bet-frame').src = submitURL;
-                }, 4000*i
-            );
-        }
+        _submitBets(data);
     });
 };
+
+function _submitBets(data) {        
+    var formSubmissions = [];
+    console.log(data);
+    for (var i = 0; i < data.length; i++) {
+        var q1ID = "entry.1590908018";  // Player
+        var q2ID = "entry.362528015";   // Amount
+        var q3ID = "entry.2132436961";  // Team
+        var q4ID = "entry.782513485";   // Outcome
+
+        var value1 = encodeURIComponent(data[i].user);
+        var value2 = encodeURIComponent(data[i].amount);
+        var value3 = encodeURIComponent(data[i].team);
+        var value4 = encodeURIComponent(data[i].stakes);
+
+        var baseURL = 'https://docs.google.com/forms/d/e/1FAIpQLSfv1pA24MZN2ZecNj90LrrgF7TVewkuS-gpGn4BtK5ExZNN2w/formResponse?';
+        var submitRef = 'submit=-7354223680545716510';
+        var submitURL = (baseURL + q1ID + "=" + value1 + "&" + 
+                                  q2ID + "=" + value2 + "&" + 
+                                  q3ID + "=" + value3 + "&" + 
+                                  q4ID + "=" + value4 + "&" + submitRef);
+
+        formSubmissions.push(submitURL);
+    }
+
+    var num = 0;
+
+    function loopBet (num) {
+       setTimeout(function () {
+            document.getElementById('bet-frame').src = formSubmissions[num];
+            num++; 
+
+            if (num < data.length) {
+                loopBet();
+            }
+       }, 3000)
+    }
+
+    loopBet();
+}
 
 function _initiateLobby() {
     renderCountChart('#countdown-chart', '#333', 60000);
