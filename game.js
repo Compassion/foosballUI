@@ -257,7 +257,7 @@ function submitData()
   var value8 = encodeURIComponent($('#notes').val());
 
   var baseURL = 'https://docs.google.com/forms/d/e/1FAIpQLScY-Gg9_PbdVVIkMYqMpJJwzoy1FVBZhAFdgoIBOmsNh4wdbQ/formResponse?';
-  var submitRef = 'submit=6247444732683940215';
+  var submitRef = 'submit=-2582568362400525186';
   var submitURL = (baseURL + q1ID + "=" + value1 + "&" + 
                               q2ID + "=" + value2 + "&" + 
                               q3ID + "=" + value3 + "&" + 

@@ -61,7 +61,7 @@ function _submitBets(data) {
         var value4 = encodeURIComponent(data[i].stakes);
 
         var baseURL = 'https://docs.google.com/forms/d/e/1FAIpQLSfv1pA24MZN2ZecNj90LrrgF7TVewkuS-gpGn4BtK5ExZNN2w/formResponse?';
-        var submitRef = 'submit=-7354223680545716510';
+        var submitRef = 'submit=-2456150375496982456';
         var submitURL = (baseURL + q1ID + "=" + value1 + "&" + 
                                   q2ID + "=" + value2 + "&" + 
                                   q3ID + "=" + value3 + "&" + 
