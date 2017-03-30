@@ -92,7 +92,6 @@ function _initiateLobby() {
 
     $('#preGame').fadeOut(500);
     $('#countdown').delay(500).fadeIn(500, playSound('gamestart'));
-	$('#countdown').delay(57000).fadeIn(500, playSound('gamestart'));
 };
 
 function _gameStarted(game) {
