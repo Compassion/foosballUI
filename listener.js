@@ -48,7 +48,7 @@ function connectToNode() {
 
 function _submitBets(data) {        
     var formSubmissions = [];
-    console.log(data);
+
     for (var i = 0; i < data.length; i++) {
         var q1ID = "entry.1590908018";  // Player
         var q2ID = "entry.362528015";   // Amount
@@ -70,17 +70,20 @@ function _submitBets(data) {
         formSubmissions.push(submitURL);
     }
 
+    console.log(formSubmissions);
+
     var num = 0;
 
-    function loopBet (num) {
-       setTimeout(function () {
-            document.getElementById('bet-frame').src = formSubmissions[num];
-            num++; 
+    function loopBet() {
+        setTimeout(
+            function () {
+                document.getElementById('bet-frame').src = formSubmissions[num];
+                num++; 
 
-            if (num < data.length) {
-                loopBet();
-            }
-       }, 3000)
+                if (num < data.length)
+                    loopBet();
+            }, 3000
+        );
     }
 
     loopBet();
