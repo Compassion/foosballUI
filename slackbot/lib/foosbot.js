@@ -28,6 +28,7 @@ var userMap = new Map();
   userMap.set("U1HBGH8P9","Mark");
   userMap.set("U1Z1H4GMR","Russell");
   userMap.set("U02DWU1V7","Simon");
+  userMap.set("U4V9F364A","Sam");
 
 var FoosBot = function Constructor(settings) {
     this.settings = settings;
