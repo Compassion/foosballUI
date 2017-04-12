@@ -1,6 +1,7 @@
 var attackRatings;
 var defenseRatings;
 var betMoney;
+var stats;
 
 var players = [];
 var count = {
@@ -32,6 +33,14 @@ function showPlayerOptions(data, tabletop) {
   delete defenseRatings['Metric'];
   delete defenseRatings['Submetric'];
   delete defenseRatings['Side of Champions'];
+
+  stats = {
+    "betMoney" : betMoney,
+    "attackRatings" : attackRatings,
+    "defenseRatings" : defenseRatings
+  }
+
+  _sendStats(stats);
 
   for(key in attackRatings){
     $('#selector').append('<label class="btn players btn-outline-primary"><span class="glyphicon glyphicon-ok"></span><input type="checkbox" id="'+ key +'" value="'+ key +'">'+ key +'</label>');
@@ -184,8 +193,7 @@ function calculateStakes(bRating, yRating)
       var game = {
         "players" : players,
         "blueWin" : bPercentage,
-        "yellowWin" : yPercentage,
-        "betMoney" : betMoney
+        "yellowWin" : yPercentage
       }
       console.log(game);
       _gameStarted(game);

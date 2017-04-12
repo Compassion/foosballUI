@@ -48,6 +48,7 @@ function connectToNode() {
 
 function _submitBets(data) {        
     var formSubmissions = [];
+    var num = 0;
 
     for (var i = 0; i < data.length; i++) {
         var q1ID = "entry.1590908018";  // Player
@@ -55,10 +56,10 @@ function _submitBets(data) {
         var q3ID = "entry.2132436961";  // Team
         var q4ID = "entry.782513485";   // Outcome
 
-        var value1 = encodeURIComponent(data[i].user);
-        var value2 = encodeURIComponent(data[i].amount);
-        var value3 = encodeURIComponent(data[i].team);
-        var value4 = encodeURIComponent(data[i].stakes);
+        var value1 = encodeURIComponent( data[i].user );
+        var value2 = encodeURIComponent( data[i].amount );
+        var value3 = encodeURIComponent( data[i].team );
+        var value4 = encodeURIComponent( data[i].stakes - data[i].amount );
 
         var baseURL = 'https://docs.google.com/forms/d/e/1FAIpQLSfv1pA24MZN2ZecNj90LrrgF7TVewkuS-gpGn4BtK5ExZNN2w/formResponse?';
         var submitRef = 'submit=-2456150375496982456';
@@ -70,18 +71,17 @@ function _submitBets(data) {
         formSubmissions.push(submitURL);
     }
 
-    console.log(formSubmissions);
-
-    var num = 0;
-
     function loopBet() {
         setTimeout(
             function () {
                 document.getElementById('bet-frame').src = formSubmissions[num];
                 num++; 
 
-                if (num < data.length)
+                if (num < data.length) {
                     loopBet();
+                } else {
+                    window.location.reload(true);
+                }
             }, 3000
         );
     }
@@ -95,6 +95,10 @@ function _initiateLobby() {
 
     $('#preGame').fadeOut(500);
     $('#countdown').delay(500).fadeIn(500, playSound('gamestart'));
+};
+
+function _sendStats(stats) {
+    socket.emit('stats', stats);
 };
 
 function _gameStarted(game) {
