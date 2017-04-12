@@ -316,11 +316,11 @@ FoosBot.prototype._checkBalance = function(message) {
 
     if (player == null || player == undefined || player == "") {
         var money = betMoney.get(userName).replace(/[$,]+/g,"");
-        self.postMessageToChannel(configChannel, userName + ', your current balance is ' + money, {as_user: true});
+        self.postMessageToChannel(configChannel, userName + ', your current balance is ' + betMoney.get(userName), {as_user: true});
     }
     else {
         var money = betMoney.get(player).replace(/[$,]+/g,"");
-        self.postMessageToChannel(configChannel, player + '\'s current balance is ' + money, {as_user: true});
+        self.postMessageToChannel(configChannel, player + '\'s current balance is ' + betMoney.get(userName), {as_user: true});
     }
 };
 
