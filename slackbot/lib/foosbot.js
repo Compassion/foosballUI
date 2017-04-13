@@ -92,6 +92,7 @@ FoosBot.prototype._onStart = function () {
             setTimeout( function() {
                 betsOpen = false;
             }, 60000 );
+        });
 
         socket.on('result', function(data) {
             self.postMessageToChannel(configChannel, ':blue: *Blue Team* ' + data.blueScore + '\n' +
@@ -112,31 +113,6 @@ FoosBot.prototype._onStart = function () {
             currentGame = {};
         });
     });
-
-    doc.getInfo(function(err, info) {
-      console.log('Loaded ' + info.title);
-      sheet = info.worksheets[0];
-      console.log('Loaded ' + sheet.title);
-      console.log(sheet);
-    });
-
-    sheet.addRow(
-        {
-            'Timestamp' : 'Val1',
-            'Who Won?' : 'Val2', 
-            'Yella - Attack' : 'Val3', 
-            'Yella - Defence' : 'Val4', 
-            'Blue - Attack' : 'Val5', 
-            'Blue - Defence': 'Val6', 
-            'Notes' : 'Val7',
-            'Yella Score': 'Val8', 
-            'Blue Score': 'Val9' 
-        },
-        function callback(err) {
-            console.log(err);
-        }
-    );
-        
 
     console.log('Bot started.');
     self.postMessageToChannel(configChannel, 'Hey, I am Foosbot. If you mention _foosball_ I will start a game up. :grin::soccer:', {as_user: true});
