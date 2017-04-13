@@ -274,31 +274,30 @@ FoosBot.prototype._checkRating = function(message) {
     var ratingCheck = message.text.split(" ");
     var userName = userMap.get(message.user);
 
-    var attackRating;
-    var defenseRating;
     var player;
 
-    if (betMessage[3] == null || betMessage[3] == "") {
-        player = betMessage[2];
-        attackRating = attackRatings.get(player);
-        defenseRating = defenseRatings.get(player);
-    } 
-    else {
-        player = betMessage[3];
-        attackRating = attackRatings.get(player);
-        defenseRating = defenseRatings.get(player);
-    }
+    if (ratingCheck[2] == null || ratingCheck[2] == "")
+        player = userName;
+
+    if (ratingCheck[3] == null || ratingCheck[3] == "")
+        player = ratingCheck[2];
+    
+    else
+        player = ratingCheck[3];
+
+    var attackRating = attackRatings.get(player);
+    var defenseRating = defenseRatings.get(player);
 
     if (player == null || player == undefined || player == "") {
         self.postMessageToChannel(configChannel, ':thinking_face: Sorry, ' + userName + ' - I don\'t understand your request.\nUse \'rating <player>\' to check a player\'s rating.', {as_user: true});
     }
     if (attackRating == undefined || defenseRating == undefined) {
-        self.postMessageToChannel(configChannel, ':thinking_face: Hmm, I don\'t have ratings stored for ' + betMessage[3], {as_user: true});
+        self.postMessageToChannel(configChannel, ':thinking_face: Hmm, I don\'t have ratings stored for ' + ratingCheck[3], {as_user: true});
     }
-    else if (betMessage[2] == 'defense' || betMessage[2] == 'defence') {
+    else if (ratingCheck[2] == 'defense' || ratingCheck[2] == 'defence') {
         self.postMessageToChannel(configChannel, player + ' has an defense rating of ' + defenseRating, {as_user: true});
     }
-    else if (betMessage[2] == 'attack') {
+    else if (ratingCheck[2] == 'attack') {
         self.postMessageToChannel(configChannel, player + ' has an attack rating of ' + attackRating, {as_user: true});
     }
     else {
@@ -314,13 +313,13 @@ FoosBot.prototype._checkBalance = function(message) {
 
     var player = balanceCheck[2];
 
-    if (player == null || player == undefined || player == "") {
-        var money = betMoney.get(userName).replace(/[$,]+/g,"");
-        self.postMessageToChannel(configChannel, userName + ', your current balance is ' + betMoney.get(userName), {as_user: true});
-    }
-    else {
+    if (player != null && player != undefined && player != "") {
         var money = betMoney.get(player).replace(/[$,]+/g,"");
         self.postMessageToChannel(configChannel, player + '\'s current balance is ' + betMoney.get(userName), {as_user: true});
+    }
+    else {
+        var money = betMoney.get(userName).replace(/[$,]+/g,"");
+        self.postMessageToChannel(configChannel, userName + ', your current balance is ' + betMoney.get(userName), {as_user: true});
     }
 };
 
