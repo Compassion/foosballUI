@@ -267,7 +267,7 @@ FoosBot.prototype._checkRating = function(message) {
     if (player == null || player == undefined || player == "") {
         self.postMessageToChannel(configChannel, ':thinking_face: Sorry, ' + userName + ' - I don\'t understand your request.\nUse \'rating <player>\' to check a player\'s rating.', {as_user: true});
     }
-    if (attackRating == undefined || defenseRating == undefined) {
+    else if (attackRating == undefined || defenseRating == undefined) {
         self.postMessageToChannel(configChannel, ':thinking_face: Hmm, I don\'t have ratings stored for ' + ratingCheck[3], {as_user: true});
     }
     else if (ratingCheck[2] == 'defense' || ratingCheck[2] == 'defence') {
@@ -289,13 +289,13 @@ FoosBot.prototype._checkBalance = function(message) {
 
     var player = balanceCheck[2];
 
-    if (player != null && player != undefined && player != "") {
-        var money = betMoney.get(player).replace(/[$,]+/g,"");
-        self.postMessageToChannel(configChannel, player + '\'s current balance is ' + betMoney.get(userName), {as_user: true});
-    }
-    else {
+    if (player == null || player == undefined || player == "") {
         var money = betMoney.get(userName).replace(/[$,]+/g,"");
         self.postMessageToChannel(configChannel, userName + ', your current balance is ' + betMoney.get(userName), {as_user: true});
+    }
+    else {
+        var money = betMoney.get(player).replace(/[$,]+/g,"");
+        self.postMessageToChannel(configChannel, player + '\'s current balance is ' + betMoney.get(userName), {as_user: true});
     }
 };
 
