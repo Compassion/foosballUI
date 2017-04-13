@@ -1,12 +1,19 @@
 'use strict';
 
 var config = require('./foosbot_config.js');
+
 var util = require('util');
 var path = require('path');
 var Bot = require('slackbots');
 var io = require('socket.io').listen(8000);
 
-var configChannel = 'foosball';
+var GoogleSpreadsheet = require('google-spreadsheet');
+var async = require('async');
+
+var doc = new GoogleSpreadsheet(config.spreadsheetId);
+var sheet;
+
+var configChannel = 'sandbox';
 var timerStarted = false;
 var betsOpen = false;
 var players = [];
@@ -114,10 +121,50 @@ FoosBot.prototype._onStart = function () {
         });
     });
 
+    self._setupSpreadsheet();
     console.log('Bot started.');
     self.postMessageToChannel(configChannel, 'Hey, I am Foosbot. If you mention _foosball_ I will start a game up. :grin::soccer:', {as_user: true});
     self._loadBotUser();   
 };
+
+FoosBot.prototype._setupSpreadsheet = function() {
+    console.log('Setting up Sheets authentication...');
+    async.series([
+        function setAuth(step) {
+            var creds = require('./Foosbot-1de73ef7298d.json');
+
+            doc.useServiceAccountAuth(creds, step);
+        },
+        function getInfoAndWorksheets(step) {
+            doc.getInfo(function(err, info) {
+                console.log('Loaded ' + info.title);
+                sheet = info.worksheets[0];
+                console.log('Loaded ' + sheet.title);
+                console.log('Sheets setup!');
+                step();
+            });
+        },
+        function addRow(step) {
+            console.log('step 3');
+            sheet.addRow(
+                {
+                    'Timestamp'         : 'Val1',
+                    'Who Won?'          : 'Val2', 
+                    'Yella - Attack'    : 'Val3', 
+                    'Yella - Defence'   : 'Val4', 
+                    'Blue - Attack'     : 'Val5', 
+                    'Blue - Defence'    : 'Val6', 
+                    'Notes'             : 'Val7',
+                    'Yella Score'       : 'Val8', 
+                    'Blue Score'        : 'Val9' 
+                },
+                function callback(err) {
+                    console.log(err);
+                }
+            );
+        }
+    ]);
+}
 
 FoosBot.prototype._payBetWinners = function(winner) {
     var self = this;
