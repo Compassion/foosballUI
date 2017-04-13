@@ -1,6 +1,7 @@
 'use strict';
 
 var config = require('./foosbot_config.js');
+var creds = require('./Foosbot-1de73ef7298d.json');
 
 var util = require('util');
 var path = require('path');
@@ -128,11 +129,9 @@ FoosBot.prototype._onStart = function () {
 };
 
 FoosBot.prototype._setupSpreadsheet = function() {
-    console.log('Setting up Sheets authentication...');
+    console.log('Setting up Spreadsheet authentication...');
     async.series([
         function setAuth(step) {
-            var creds = require('./Foosbot-1de73ef7298d.json');
-
             doc.useServiceAccountAuth(creds, step);
         },
         function getInfoAndWorksheets(step) {
@@ -140,30 +139,18 @@ FoosBot.prototype._setupSpreadsheet = function() {
                 console.log('Loaded ' + info.title);
                 sheet = info.worksheets[0];
                 console.log('Loaded ' + sheet.title);
-                console.log('Sheets setup!');
-                step();
+                console.log('Spreadsheet is setup.');
             });
-        },
-        function addRow(step) {
-            console.log('step 3');
-            sheet.addRow(
-                {
-                    'Timestamp'         : 'Val1',
-                    'Who Won?'          : 'Val2', 
-                    'Yella - Attack'    : 'Val3', 
-                    'Yella - Defence'   : 'Val4', 
-                    'Blue - Attack'     : 'Val5', 
-                    'Blue - Defence'    : 'Val6', 
-                    'Notes'             : 'Val7',
-                    'Yella Score'       : 'Val8', 
-                    'Blue Score'        : 'Val9' 
-                },
-                function callback(err) {
-                    console.log(err);
-                }
-            );
         }
     ]);
+}
+
+FoosBot.prototype._newRow = function(rowData, sheet) {
+    sheet.addRow(rowData,
+        function callback(err) {
+            if (err != null) console.log(err);
+        }
+    );
 }
 
 FoosBot.prototype._payBetWinners = function(winner) {
