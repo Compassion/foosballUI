@@ -1,7 +1,7 @@
 'use strict';
 
 var config = require('./foosbot_config.js');
-var creds = require('./Foosbot-1de73ef7298d.json');
+var creds = require('./Foosbot-aed787c23f63.json');
 
 var util = require('util');
 var path = require('path');
@@ -155,6 +155,8 @@ FoosBot.prototype._setupSpreadsheet = function() {
 }
 
 FoosBot.prototype._newRow = function(rowData, sheet) {
+    console.log("New row: ", rowData);
+
     sheet.addRow(rowData,
         function callback(err) {
             if (err != null) console.log(err);
@@ -251,7 +253,7 @@ FoosBot.prototype._processBet = function(message) {
 
     var betMessage = message.text.split(" ");
     var userName = userMap.get(message.user);
-    var userMoney = betMoney.get(userName).replace(/[$,]+/g,"");
+    var userMoney = betMoney.get(userName).replace("$","").replace(",","");
 
     var bet = { "Player" : userName, "Action" : "Placed bet", "Team" : null, "Amount" : null }
 
@@ -268,14 +270,14 @@ FoosBot.prototype._processBet = function(message) {
         var amount = parseInt(betMessage[2]);
 
         if(betMessage[1].toLowerCase() == 'blue') {
-            bet.team = 'Blue';
-            bet.amount = amount;
+            bet.Team = 'Blue';
+            bet.Amount = amount;
             bet.potentialWin = amount * currentGame.blueOdds;
             betMoney.set(userName, userMoney - amount);
         }
         else if(betMessage[1].toLowerCase() == 'yellow') {
-            bet.team = 'Yellow';
-            bet.amount = amount;
+            bet.Team = 'Yellow';
+            bet.Amount = amount;
             bet.potentialWin = amount * currentGame.yellowOdds;
             betMoney.set(userName, userMoney - amount);
         }

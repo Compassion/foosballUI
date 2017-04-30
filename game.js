@@ -15,7 +15,7 @@ var gamePlayed = false;
 
 $( document ).ready(function() {
   
-  Tabletop.init( { key: 'https://docs.google.com/spreadsheets/d/18Z8ngS2h9iYyk80lxLyiN5tiih__RUL5KKhal-Z6fsw/pubhtml?gid=1440610671&single=true',
+  Tabletop.init( { key: 'https://docs.google.com/spreadsheets/d/11SKnU_s4aYdpcPbw68jUoWRw7gQtP9RTSbDP3uXmsnI/pubhtml?gid=1440610671&single=true',
                   callback: showPlayerOptions,
                   simpleSheet: true } )
 });
@@ -26,14 +26,14 @@ function showPlayerOptions(data, tabletop) {
   attackRatings = data[1];
   defenseRatings = data[2];
   betMoney = data[3];
-  
+
   delete attackRatings['Metric'];
   delete attackRatings['Submetric'];
   delete attackRatings['Side of Champions'];
   delete defenseRatings['Metric'];
   delete defenseRatings['Submetric'];
   delete defenseRatings['Side of Champions'];
-
+ 
   stats = {
     "betMoney" : betMoney,
     "attackRatings" : attackRatings,
@@ -258,10 +258,10 @@ function submitData()
   }
 
   var result =  {
-                  "Timestamp" : Datetime.now(),
+                  "Timestamp" : new Date().toLocaleString(),
                   "Winner" : winner,
                   "BlueScore" : blueScore,
-                  "YellowScore" : yellowScore
+                  "YellowScore" : yellowScore,
                   "BlueAttack" : players[0],
                   "BlueDefense" : players[1],
                   "BlueRatingChange": blueRatingAmount,
