@@ -236,44 +236,40 @@ function newChart(container, colour, time) {
 function submitData()
 {
   var blueScore = parseInt($('#blue-score').val());
+  var bWin = $('#blue-win-stake-value').html();
+  var bLoss = $('#blue-loss-stake').html();
+
   var yellowScore = parseInt($('#yellow-score').val());
-  var winner = (blueScore > yellowScore) ? 'Blue' : 'Yella';
+  var yWin = $('#yellow-win-stake-value').html();
+  var yLoss = $('#yellow-loss-stake').html();
+
+  var notes =  $('#notes').val();
+
+  var winner = (blueScore > yellowScore) ? 'Blue' : 'Yellow';
+
+  var yellowRatingAmount, blueRatingAmount;
+
+  if (winner == "Blue") {
+    blueRatingAmount = bWin;
+    yellowRatingAmount = yLoss;
+  } else {
+    blueRatingAmount = bLoss;
+    yellowRatingAmount = yWin;
+  }
 
   var result =  {
-                  "blueScore" : blueScore,
-                  "yellowScore" : yellowScore
+                  "Timestamp" : Datetime.now(),
+                  "Winner" : winner,
+                  "BlueScore" : blueScore,
+                  "YellowScore" : yellowScore
+                  "BlueAttack" : players[0],
+                  "BlueDefense" : players[1],
+                  "BlueRatingChange": blueRatingAmount,
+                  "YellowAttack": players[2],
+                  "YellowDefense": players[3],
+                  "YellowRatingChange" : yellowRatingAmount,
+                  "Notes" : notes
                 };
 
   _gameFinished(result);
-
-  var q1ID = "entry.247460283";   // Winner
-  var q2ID = "entry.449488357";   // Yellow Score
-  var q3ID = "entry.1023685467";  // Blue Score
-  var q4ID = "entry.569780061";   // Yellow Attack
-  var q5ID = "entry.417127845";   // Yellow Defense
-  var q6ID = "entry.855683837";   // Blue Attack
-  var q7ID = "entry.1044104149";  // Blue Defense
-  var q8ID = "entry.131725794";   // Notes
-
-  var value1 = encodeURIComponent(winner);
-  var value2 = encodeURIComponent(yellowScore);
-  var value3 = encodeURIComponent(blueScore);
-  var value4 = encodeURIComponent(players[2]);
-  var value5 = encodeURIComponent(players[3]);
-  var value6 = encodeURIComponent(players[0]);
-  var value7 = encodeURIComponent(players[1]);
-  var value8 = encodeURIComponent($('#notes').val());
-
-  var baseURL = 'https://docs.google.com/forms/d/e/1FAIpQLScY-Gg9_PbdVVIkMYqMpJJwzoy1FVBZhAFdgoIBOmsNh4wdbQ/formResponse?';
-  var submitRef = 'submit=-2582568362400525186';
-  var submitURL = (baseURL + q1ID + "=" + value1 + "&" + 
-                              q2ID + "=" + value2 + "&" + 
-                              q3ID + "=" + value3 + "&" + 
-                              q4ID + "=" + value4 + "&" + 
-                              q5ID + "=" + value5 + "&" + 
-                              q6ID + "=" + value6 + "&" + 
-                              q7ID + "=" + value7 + "&" +
-                              q8ID + "=" + value8 + "&" + submitRef);
-  console.log(submitURL);
-  document.getElementById('no-target').src = submitURL;
 }

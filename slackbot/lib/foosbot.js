@@ -12,7 +12,7 @@ var GoogleSpreadsheet = require('google-spreadsheet');
 var async = require('async');
 
 var doc = new GoogleSpreadsheet(config.spreadsheetId);
-var sheet;
+var resultsSheet, betsSheet;
 
 var configChannel = 'sandbox';
 var timerStarted = false;
@@ -22,10 +22,10 @@ var currentGame = {};
 var currentBets = [];
 var currentUser;
 
-var attackRatings;
-var defenseRatings;
-    
+var attackRatings = new Map();
+var defenseRatings = new Map();
 var betMoney = new Map();
+
 var userMap = new Map();
   userMap.set("U02DXHA8Q","Alecia");
   userMap.set("U02DWKVSD","Brentan");
@@ -70,8 +70,13 @@ FoosBot.prototype._onStart = function () {
 		});
         
         socket.on('stats', function(data) {
-            attackRatings = data.attackRatings;
-            defenseRatings = data.defenseRatings;
+            for(var key in data.attackRatings){
+                attackRatings.set(key, data.attackRatings[key]);
+            }
+
+            for(var key in data.defenseRatings){
+                defenseRatings.set(key, data.defenseRatings[key]);
+            }
 
             for(var key in data.betMoney){
                 betMoney.set(key, data.betMoney[key]);
@@ -118,6 +123,8 @@ FoosBot.prototype._onStart = function () {
                 self._payBetWinners(winner);
             }, 5000);
 
+            self._newRow(data, resultsSheet);
+
             currentGame = {};
         });
     });
@@ -137,8 +144,10 @@ FoosBot.prototype._setupSpreadsheet = function() {
         function getInfoAndWorksheets(step) {
             doc.getInfo(function(err, info) {
                 console.log('Loaded ' + info.title);
-                sheet = info.worksheets[0];
-                console.log('Loaded ' + sheet.title);
+                resultsSheet = info.worksheets[0];
+                betsSheet = info.worksheets[1];
+                console.log('Loaded ' + resultsSheet.title);
+                console.log('Loaded ' + betsSheet.title);
                 console.log('Spreadsheet is setup.');
             });
         }
@@ -157,16 +166,19 @@ FoosBot.prototype._payBetWinners = function(winner) {
     var self = this;
 
     for (var i = currentBets.length - 1; i >= 0; i--) {
-        if (currentBets[i].team.toLowerCase() != winner.toLowerCase()) {
-            currentBets[i].stakes = currentBets[i].amount - (currentBets[i].amount * 2);
-            self.postMessageToChannel(configChannel, ':heavy_minus_sign::heavy_dollar_sign: ' + currentBets[i].user + ' bet $' + currentBets[i].amount + ' on ' + currentBets[i].team + ' and walks away with nothing. :worried:', {as_user: true});
+        if (currentBets[i].Team.toLowerCase() != winner.toLowerCase()) {
+            self.postMessageToChannel(configChannel, ':heavy_minus_sign::heavy_dollar_sign: ' + currentBets[i].User + ' bet $' + currentBets[i].Amount + ' on ' + currentBets[i].Team + ' and walks away with nothing. :worried:', {as_user: true});
+            
         }
-        else if (currentBets[i].team.toLowerCase() == winner.toLowerCase()) {
-            self.postMessageToChannel(configChannel, ':heavy_plus_sign::heavy_dollar_sign: ' + currentBets[i].user + ' bet $' + currentBets[i].amount + ' on ' + currentBets[i].team + ' and walks away with $' + currentBets[i].stakes + ' :money_mouth_face:', {as_user: true});
+        else if (currentBets[i].Team.toLowerCase() == winner.toLowerCase()) {
+            self.postMessageToChannel(configChannel, ':heavy_plus_sign::heavy_dollar_sign: ' + currentBets[i].User + ' bet $' + currentBets[i].Amount + ' on ' + currentBets[i].Team + ' and walks away with $' + currentBets[i].potentialWin + ' :money_mouth_face:', {as_user: true});
+        
+            currentBets[i].Reason = "Bet winnings";
+            currentBets[i].Amount = currentBets[i].potentialWin;
+            delete currentBets[i].potentialWin;
+            self._newRow(currentBets[i], betsSheet);
         }
     }
-
-    io.emit('bets', currentBets);
     
     currentBets = [];
 }
@@ -241,7 +253,7 @@ FoosBot.prototype._processBet = function(message) {
     var userName = userMap.get(message.user);
     var userMoney = betMoney.get(userName).replace(/[$,]+/g,"");
 
-    var bet = { "user" : userName, "team" : null, "stakes" : null }
+    var bet = { "Player" : userName, "Action" : "Placed bet", "Team" : null, "Amount" : null }
 
     if (betsOpen == false) {
         self.postMessageToChannel(configChannel, ':x: Sorry, ' + userName + ' - betting is not open right now.', {as_user: true});
@@ -258,13 +270,13 @@ FoosBot.prototype._processBet = function(message) {
         if(betMessage[1].toLowerCase() == 'blue') {
             bet.team = 'Blue';
             bet.amount = amount;
-            bet.stakes = amount * currentGame.blueOdds;
+            bet.potentialWin = amount * currentGame.blueOdds;
             betMoney.set(userName, userMoney - amount);
         }
         else if(betMessage[1].toLowerCase() == 'yellow') {
             bet.team = 'Yellow';
             bet.amount = amount;
-            bet.stakes = amount * currentGame.yellowOdds;
+            bet.potentialWin = amount * currentGame.yellowOdds;
             betMoney.set(userName, userMoney - amount);
         }
         else {
@@ -272,9 +284,14 @@ FoosBot.prototype._processBet = function(message) {
         }
     }
 
-    if (bet.stakes != null) {
+    if (bet.potentialWin != null) {
         currentBets.push(bet);
+        
+        delete bet.potentialWin;
+        bet.Amount = bet.Amount - (bet.Amount * 2);
+
         self.postMessageToChannel(configChannel, ':heavy_dollar_sign: Bet recorded for ' + userName, {as_user: true});
+        self._newRow(bet, betsSheet);
     }
 };
 
@@ -286,14 +303,15 @@ FoosBot.prototype._checkRating = function(message) {
 
     var player;
 
-    if (ratingCheck[2] == null || ratingCheck[2] == "")
+    if (ratingCheck[1] == null || ratingCheck[1] == ""){
         player = userName;
-
-    if (ratingCheck[3] == null || ratingCheck[3] == "")
+    }
+    else if (ratingCheck[2] == null || ratingCheck[2] == ""){
+        player = ratingCheck[1];
+    }
+    else {
         player = ratingCheck[2];
-    
-    else
-        player = ratingCheck[3];
+    }
 
     var attackRating = attackRatings.get(player);
     var defenseRating = defenseRatings.get(player);
@@ -302,12 +320,12 @@ FoosBot.prototype._checkRating = function(message) {
         self.postMessageToChannel(configChannel, ':thinking_face: Sorry, ' + userName + ' - I don\'t understand your request.\nUse \'rating <player>\' to check a player\'s rating.', {as_user: true});
     }
     else if (attackRating == undefined || defenseRating == undefined) {
-        self.postMessageToChannel(configChannel, ':thinking_face: Hmm, I don\'t have ratings stored for ' + ratingCheck[3], {as_user: true});
+        self.postMessageToChannel(configChannel, ':thinking_face: Hmm, I don\'t have ratings stored for ' + player, {as_user: true});
     }
-    else if (ratingCheck[2] == 'defense' || ratingCheck[2] == 'defence') {
+    else if (ratingCheck[1] == 'defense' || ratingCheck[2] == 'defence') {
         self.postMessageToChannel(configChannel, player + ' has an defense rating of ' + defenseRating, {as_user: true});
     }
-    else if (ratingCheck[2] == 'attack') {
+    else if (ratingCheck[1] == 'attack') {
         self.postMessageToChannel(configChannel, player + ' has an attack rating of ' + attackRating, {as_user: true});
     }
     else {
