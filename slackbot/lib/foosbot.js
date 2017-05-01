@@ -63,8 +63,8 @@ FoosBot.prototype._onStart = function () {
                 defenseRatings.set(key, data.defenseRatings[key]);
             }
 
-            for(var key in data.slackIds){
-                userMap.set(key, data.slackIds[key]);
+            for(var key in data.slackUsers){
+                userMap.set(key, data.slackUsers[key]);
             }
 
             for(var key in data.betMoney){

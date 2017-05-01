@@ -1,4 +1,4 @@
-var slackIds;
+var slackUsers;
 var attackRatings;
 var defenseRatings;
 var betMoney;
@@ -25,7 +25,7 @@ $( document ).ready(function() {
 function showPlayerOptions(data, tabletop) {
   connectToNode();
 
-  slackIds = data[0];
+  slackUsers = data[0];
   attackRatings = data[2];
   defenseRatings = data[3];
   betMoney = data[4];
@@ -42,7 +42,8 @@ function showPlayerOptions(data, tabletop) {
   stats = {
     "betMoney" : betMoney,
     "attackRatings" : attackRatings,
-    "defenseRatings" : defenseRatings
+    "defenseRatings" : defenseRatings,
+    "slackUsers" : slackUsers
   }
 
   _sendStats(stats);
