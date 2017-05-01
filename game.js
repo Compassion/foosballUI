@@ -31,9 +31,11 @@ function showPlayerOptions(data, tabletop) {
   betMoney = data[4];
 
   delete attackRatings['Metric'];
+  delete attackRatings['Rating'];
   delete attackRatings['Submetric'];
   delete attackRatings['Side of Champions'];
   delete defenseRatings['Metric'];
+  delete defenseRatings['Rating'];
   delete defenseRatings['Submetric'];
   delete defenseRatings['Side of Champions'];
  
