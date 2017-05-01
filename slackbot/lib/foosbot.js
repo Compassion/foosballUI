@@ -108,19 +108,18 @@ FoosBot.prototype._onStart = function () {
         });
 
         socket.on('result', function(data) {
-            self.postMessageToChannel(configChannel, ':blue: *Blue Team* ' + data.blueScore + '\n' +
-                                                     ':yellow: *Yellow Team* ' + data.yellowScore, {as_user: true});
+            self.postMessageToChannel(configChannel, ':blue: *Blue Team* ' + data.BlueScore + '\n' +
+                                                     ':yellow: *Yellow Team* ' + data.YellowScore, {as_user: true});
 
-            var winner = (parseInt(data.blueScore) > parseInt(data.yellowScore)) ? 'Blue' : 'Yellow';
-            var attackWinner = (winner == 'Blue') ? currentGame.players[0] : currentGame.players[2];
-            var defenseWinner = (winner == 'Blue') ? currentGame.players[1] : currentGame.players[3];
+            var attackWinner = (data.Winner == 'Blue') ? data.BlueAttack : data.YellowAttack;
+            var defenseWinner = (data.Winner == 'Blue') ? data.BlueDefense : data.YellowDefense;
 
             setTimeout ( function() {
-                self.postMessageToChannel(configChannel, ':tada: Congratulations ' + attackWinner + ' and ' + defenseWinner + ' on a Team ' + winner + ' victory!', {as_user: true});
+                self.postMessageToChannel(configChannel, ':tada: Congratulations ' + attackWinner + ' and ' + defenseWinner + ' on a Team ' + data.Winner + ' victory!', {as_user: true});
             }, 1000);
 
             setTimeout ( function() {
-                self._payBetWinners(winner);
+                self._payBetWinners(data.Winner);
             }, 5000);
 
             self._newRow(data, resultsSheet);
@@ -169,13 +168,13 @@ FoosBot.prototype._payBetWinners = function(winner) {
 
     for (var i = currentBets.length - 1; i >= 0; i--) {
         if (currentBets[i].Team.toLowerCase() != winner.toLowerCase()) {
-            self.postMessageToChannel(configChannel, ':heavy_minus_sign::heavy_dollar_sign: ' + currentBets[i].User + ' bet $' + currentBets[i].Amount + ' on ' + currentBets[i].Team + ' and walks away with nothing. :worried:', {as_user: true});
+            self.postMessageToChannel(configChannel, ':heavy_minus_sign::heavy_dollar_sign: ' + currentBets[i].Player + ' bet $' + Math.abs(currentBets[i].Amount) + ' on ' + currentBets[i].Team + ' and walks away with nothing. :worried:', {as_user: true});
             
         }
         else if (currentBets[i].Team.toLowerCase() == winner.toLowerCase()) {
-            self.postMessageToChannel(configChannel, ':heavy_plus_sign::heavy_dollar_sign: ' + currentBets[i].User + ' bet $' + currentBets[i].Amount + ' on ' + currentBets[i].Team + ' and walks away with $' + currentBets[i].potentialWin + ' :money_mouth_face:', {as_user: true});
+            self.postMessageToChannel(configChannel, ':heavy_plus_sign::heavy_dollar_sign: ' + currentBets[i].Player + ' bet $' + Math.abs(currentBets[i].Amount) + ' on ' + currentBets[i].Team + ' and walks away with $' + currentBets[i].potentialWin + ' :money_mouth_face:', {as_user: true});
         
-            currentBets[i].Reason = "Bet winnings";
+            currentBets[i].Action = "Bet winnings";
             currentBets[i].Amount = currentBets[i].potentialWin;
             delete currentBets[i].potentialWin;
             self._newRow(currentBets[i], betsSheet);
@@ -288,12 +287,13 @@ FoosBot.prototype._processBet = function(message) {
 
     if (bet.potentialWin != null) {
         currentBets.push(bet);
-        
-        delete bet.potentialWin;
-        bet.Amount = bet.Amount - (bet.Amount * 2);
-
         self.postMessageToChannel(configChannel, ':heavy_dollar_sign: Bet recorded for ' + userName, {as_user: true});
-        self._newRow(bet, betsSheet);
+
+        var betRow = bet;
+        betRow.Amount = betRow.Amount - (betRow.Amount * 2);
+        delete betRow.potentialWin;
+
+        self._newRow(betRow, betsSheet);
     }
 };
 
@@ -341,16 +341,23 @@ FoosBot.prototype._checkBalance = function(message) {
     var balanceCheck = message.text.split(" ");
     var userName = userMap.get(message.user);
 
-    var player = balanceCheck[2];
-
+    var player = balanceCheck[1];
     if (player == null || player == undefined || player == "") {
-        var money = betMoney.get(userName).replace(/[$,]+/g,"");
-        self.postMessageToChannel(configChannel, userName + ', your current balance is ' + betMoney.get(userName), {as_user: true});
+        if (betMoney.get(userName) == undefined) {
+            self.postMessageToChannel(configChannel, 'I don\'t have a balance for ' + userName, {as_user: true});
+        } else {
+            var money = betMoney.get(userName).replace("$","").replace(",","");
+            self.postMessageToChannel(configChannel, userName + ', your current balance is ' + betMoney.get(userName), {as_user: true});
+        }
     }
     else {
-        var money = betMoney.get(player).replace(/[$,]+/g,"");
-        self.postMessageToChannel(configChannel, player + '\'s current balance is ' + betMoney.get(userName), {as_user: true});
-    }
+        if (betMoney.get(player) == undefined) {
+            self.postMessageToChannel(configChannel, 'I don\'t have a balance for ' + player, {as_user: true});
+        } else {
+            var money = betMoney.get(player).replace("$","").replace(",","");
+            self.postMessageToChannel(configChannel, player + '\'s current balance is ' + betMoney.get(userName), {as_user: true});
+        }
+    } 
 };
 
 FoosBot.prototype._addToGame = function(user) {
