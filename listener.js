@@ -11,7 +11,7 @@ function connectToNode() {
 
     socket.on('message', function(data) {
         
-        if(data == 'CHECK') {            
+        if(data == 'CHECK') {
             if (gamePlayed){
                 socket.send('ERROR');
             }
@@ -40,54 +40,7 @@ function connectToNode() {
         document.getElementById(data).checked = true;
         $('#countdown-players').append('<label class="btn active players btn-outline-primary"><span class="glyphicon glyphicon-ok"></span><input type="checkbox" checked>'+ data +'</label>');
     });
-
-    socket.on('bets', function(data){
-        _submitBets(data);
-    });
 };
-
-function _submitBets(data) {        
-    var formSubmissions = [];
-    var num = 0;
-
-    for (var i = 0; i < data.length; i++) {
-        var q1ID = "entry.1590908018";  // Player
-        var q2ID = "entry.362528015";   // Amount
-        var q3ID = "entry.2132436961";  // Team
-        var q4ID = "entry.782513485";   // Outcome
-
-        var value1 = encodeURIComponent( data[i].user );
-        var value2 = encodeURIComponent( data[i].amount );
-        var value3 = encodeURIComponent( data[i].team );
-        var value4 = encodeURIComponent( data[i].stakes - data[i].amount );
-
-        var baseURL = 'https://docs.google.com/forms/d/e/1FAIpQLSfv1pA24MZN2ZecNj90LrrgF7TVewkuS-gpGn4BtK5ExZNN2w/formResponse?';
-        var submitRef = 'submit=-2456150375496982456';
-        var submitURL = (baseURL + q1ID + "=" + value1 + "&" + 
-                                  q2ID + "=" + value2 + "&" + 
-                                  q3ID + "=" + value3 + "&" + 
-                                  q4ID + "=" + value4 + "&" + submitRef);
-
-        formSubmissions.push(submitURL);
-    }
-
-    function loopBet() {
-        setTimeout(
-            function () {
-                document.getElementById('bet-frame').src = formSubmissions[num];
-                num++; 
-
-                if (num < data.length) {
-                    loopBet();
-                } else {
-                    window.location.reload(true);
-                }
-            }, 3000
-        );
-    }
-
-    loopBet();
-}
 
 function _initiateLobby() {
     renderCountChart('#countdown-chart', '#333', 60000);
@@ -107,6 +60,12 @@ function _gameStarted(game) {
 
 function _gameFinished(result) {
     socket.emit('result', result);
+
+    setTimeout( 
+        function() {
+            location.reload();
+        }, 5000
+    );
 };
 
 function renderCountChart(container, colour, time) {
