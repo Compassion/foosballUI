@@ -194,6 +194,10 @@ FoosBot.prototype._onMessage = function(message) {
             this._processTip(message);
         }
     }
+
+    if (userMap.get(message.user) == undefined) {
+        this.postMessageToChannel(configChannel, '_Also, I\'m not sure who you are. Make sure your Slack ID (' + message.user + ') is stored in the spreadsheet', {as_user: true});
+    }
 };
 
 FoosBot.prototype._onGameMessage = function(message) {
