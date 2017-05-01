@@ -14,7 +14,7 @@ var async = require('async');
 var doc = new GoogleSpreadsheet(config.spreadsheetId);
 var resultsSheet, betsSheet;
 
-var configChannel = 'sandbox';
+var configChannel = 'foosball';
 var timerStarted = false;
 var betsOpen = false;
 var players = [];
@@ -25,22 +25,7 @@ var currentUser;
 var attackRatings = new Map();
 var defenseRatings = new Map();
 var betMoney = new Map();
-
 var userMap = new Map();
-  userMap.set("U02DXHA8Q","Alecia");
-  userMap.set("U02DWKVSD","Brentan");
-  userMap.set("U02DXGZKJ","Chris");
-  userMap.set("U2MP4P3C1","Danny");
-  userMap.set("U02G7G6EQ","Erik");
-  userMap.set("U3R4W0VAR","Joel");
-  userMap.set("U02D31X9V","Josh");
-  userMap.set("U02D3247T","Jon");
-  userMap.set("U02EE639P","Lucas");
-  userMap.set("U02D3291H","Matt");
-  userMap.set("U1HBGH8P9","Mark");
-  userMap.set("U1Z1H4GMR","Russell");
-  userMap.set("U02DWU1V7","Simon");
-  userMap.set("U4V9F364A","Sam");
 
 var FoosBot = function Constructor(settings) {
     this.settings = settings;
@@ -76,6 +61,10 @@ FoosBot.prototype._onStart = function () {
 
             for(var key in data.defenseRatings){
                 defenseRatings.set(key, data.defenseRatings[key]);
+            }
+
+            for(var key in data.slackUserIds){
+                userMap.set(key, data.slackIds[key]);
             }
 
             for(var key in data.betMoney){
@@ -154,8 +143,6 @@ FoosBot.prototype._setupSpreadsheet = function() {
 }
 
 FoosBot.prototype._newRow = function(rowData, sheet) {
-    console.log("New row: ", rowData);
-
     sheet.addRow(rowData,
         function callback(err) {
             if (err != null) console.log(err);
@@ -202,6 +189,9 @@ FoosBot.prototype._onMessage = function(message) {
         }
         if (this._checkMessage(message, 'balance')) {
             this._checkBalance(message);
+        }
+        if (this._checkMessage(message, 'tip')) {
+            this._processTip(message);
         }
     }
 };
@@ -260,7 +250,7 @@ FoosBot.prototype._processBet = function(message) {
         self.postMessageToChannel(configChannel, ':x: Sorry, ' + userName + ' - betting is not open right now.', {as_user: true});
     } 
     else if (betMessage[2] == null || betMessage[2] == "" || parseInt(betMessage[2]) == "NaN" || parseInt(betMessage[2]) < 0) {
-        self.postMessageToChannel(configChannel, ':thinking_face: Sorry, ' + userName + ' - I don\'t understand your bet request.\nThe bet amount should be numbers only - for example, \'_bet blue 100_\'', {as_user: true});
+        self.postMessageToChannel(configChannel, ':thinking_face: Sorry, ' + userName + ' - I don\'t understand your bet request.\nThe bet amount should be numbers only - for example, _bet blue 100_', {as_user: true});
     }
     else if (betMessage[2] > parseInt(userMoney)) {
         self.postMessageToChannel(configChannel, ':sweat_smile: You don\'t have that much money to throw around, ' + userName + '!', {as_user: true});
@@ -295,6 +285,41 @@ FoosBot.prototype._processBet = function(message) {
 
         self._newRow(betRow, betsSheet);
     }
+};
+
+
+FoosBot.prototype._processTip = function(message) {
+    var self = this;
+
+    var tipMessage = message.text.split(" ");
+    var userName = userMap.get(message.user);
+    var userMoney = betMoney.get(userName).replace("$","").replace(",","");
+
+    var tipOut = { "Player" : userName, "Action" : "Gives tip", "Team" : "", "Amount" : null };
+    var tipIn = { "Player" : null, "Action" : "Receives tip", "Team" : "", "Amount" : null };
+
+    if (tipMessage[2] == null || tipMessage[2] == "" || parseInt(tipMessage[2]) == "NaN" || parseInt(tipMessage[2]) < 0) {
+        self.postMessageToChannel(configChannel, ':thinking_face: Sorry, ' + userName + ' - I don\'t understand your tip request.\nThe tip amount should be numbers only - for example, _tip <player> 100_', {as_user: true});
+    }
+    else if (tipMessage[2] > parseInt(userMoney)) {
+        self.postMessageToChannel(configChannel, ':sweat_smile: You don\'t have that much money to tip with, ' + userName + '!', {as_user: true});
+    }
+    else {
+        var recipient = tipMessage[1];
+        var amount = parseInt(tipMessage[2]);
+
+        tipOut.Amount = amount - (amount * 2);
+
+        tipIn.Amount = amount;
+        tipIn.Player = recipient;
+
+        betMoney.set(userName, userMoney - amount);
+    }
+
+    self.postMessageToChannel(configChannel, ':money_with_wings: ' + tipOut.Player + ' tips ' + tipIn.Player + ' $' + tipIn.Amount, {as_user: true});
+
+    self._newRow(tipOut, betsSheet);
+    self._newRow(tipIn, betsSheet);
 };
 
 FoosBot.prototype._checkRating = function(message) {
@@ -422,7 +447,7 @@ FoosBot.prototype._isFromFoosBot = function (message) {
 };
 
 FoosBot.prototype._isMentioningFoosball = function (message) {
-    var isMentioningFoosball = message.text.toLowerCase().indexOf('foosball') > -1 || message.text.toLowerCase().indexOf(this.name.toLowerCase()) > -1;
+    var isMentioningFoosball = message.text.toLowerCase().indexOf('foosball') > -1;
     // console.log('Is mentioning foosball or FoosBot?', isMentioningFoosball);
     return isMentioningFoosball;
 };
@@ -434,6 +459,11 @@ FoosBot.prototype._isJoinGameMessage = function (message) {
 
 FoosBot.prototype._checkMessage = function (message, check) {
     var checkMessage = message.text.toLowerCase().startsWith(check.toLowerCase());
+    return checkMessage;
+};
+
+FoosBot.prototype._checkContains = function (message, contains) {
+    var checkMessage = message.text.toLowerCase().indexOf(contains.toLowerCase()) > -1;
     return checkMessage;
 };
 

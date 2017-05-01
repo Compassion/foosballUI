@@ -11,7 +11,7 @@ function connectToNode() {
 
     socket.on('message', function(data) {
         
-        if(data == 'CHECK') {            
+        if(data == 'CHECK') {
             if (gamePlayed){
                 socket.send('ERROR');
             }
@@ -60,6 +60,12 @@ function _gameStarted(game) {
 
 function _gameFinished(result) {
     socket.emit('result', result);
+
+    setTimeout( 
+        function() {
+            location.reload();
+        }, 5000
+    );
 };
 
 function renderCountChart(container, colour, time) {

@@ -1,6 +1,8 @@
+var slackIds;
 var attackRatings;
 var defenseRatings;
 var betMoney;
+
 var stats;
 
 var players = [];
@@ -23,9 +25,10 @@ $( document ).ready(function() {
 function showPlayerOptions(data, tabletop) {
   connectToNode();
 
-  attackRatings = data[1];
-  defenseRatings = data[2];
-  betMoney = data[3];
+  slackIds = data[0];
+  attackRatings = data[2];
+  defenseRatings = data[3];
+  betMoney = data[4];
 
   delete attackRatings['Metric'];
   delete attackRatings['Submetric'];
