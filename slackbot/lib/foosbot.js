@@ -63,7 +63,7 @@ FoosBot.prototype._onStart = function () {
                 defenseRatings.set(key, data.defenseRatings[key]);
             }
 
-            for(var key in data.slackUserIds){
+            for(var key in data.slackIds){
                 userMap.set(key, data.slackIds[key]);
             }
 
@@ -194,7 +194,7 @@ FoosBot.prototype._onMessage = function(message) {
             this._processTip(message);
         }
 	    if (userMap.get(message.user) == undefined) {
-	        this.postMessageToChannel(configChannel, '_Also, I\'m not sure who you are. Make sure your Slack ID (' + message.user + ') is stored in the spreadsheet', {as_user: true});
+	        this.postMessageToChannel(configChannel, '_Also, I\'m not sure who you are. Make sure your Slack ID (' + message.user + ') is stored in the spreadsheet_', {as_user: true});
 	    }
     }
 
