@@ -30,6 +30,11 @@ function showPlayerOptions(data, tabletop) {
   defenseRatings = data[3];
   betMoney = data[4];
 
+  // Remove currency formatting
+  for (var i = 0; i < betMoney.length; i++) {
+    betMoney[i] = betMoney[i].replace(/[^0-9\.]+/g,"");
+  }
+
   delete attackRatings['Metric'];
   delete attackRatings['Rating'];
   delete attackRatings['Submetric'];

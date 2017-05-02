@@ -250,7 +250,7 @@ FoosBot.prototype._processBet = function(message) {
 
     var betMessage = message.text.split(" ");
     var userName = userMap.get(message.user);
-    var userMoney = betMoney.get(userName).replace("$","").replace(",","");
+    var userMoney = betMoney.get(userName);
 
     var bet = { "Player" : userName, "Action" : "Placed bet", "Team" : null, "Amount" : null }
 
@@ -301,7 +301,7 @@ FoosBot.prototype._processTip = function(message) {
 
     var tipMessage = message.text.split(" ");
     var userName = userMap.get(message.user);
-    var userMoney = betMoney.get(userName).replace("$","").replace(",","");
+    var userMoney = betMoney.get(userName);
 
     var tipOut = { "Player" : userName, "Action" : "Gives tip", "Team" : "", "Amount" : null };
     var tipIn = { "Player" : null, "Action" : "Receives tip", "Team" : "", "Amount" : null };
@@ -379,7 +379,7 @@ FoosBot.prototype._checkBalance = function(message) {
         if (betMoney.get(userName) == undefined) {
             self.postMessageToChannel(configChannel, 'I don\'t have a balance for ' + userName, {as_user: true});
         } else {
-            var money = betMoney.get(userName).replace("$","").replace(",","");
+            var money = betMoney.get(userName);
             self.postMessageToChannel(configChannel, userName + ', your current balance is ' + betMoney.get(userName), {as_user: true});
         }
     }
@@ -387,7 +387,7 @@ FoosBot.prototype._checkBalance = function(message) {
         if (betMoney.get(player) == undefined) {
             self.postMessageToChannel(configChannel, 'I don\'t have a balance for ' + player, {as_user: true});
         } else {
-            var money = betMoney.get(player).replace("$","").replace(",","");
+            var money = betMoney.get(player);
             self.postMessageToChannel(configChannel, player + '\'s current balance is ' + betMoney.get(userName), {as_user: true});
         }
     } 
