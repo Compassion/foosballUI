@@ -14,7 +14,7 @@ var async = require('async');
 var doc = new GoogleSpreadsheet(config.spreadsheetId);
 var resultsSheet, betsSheet;
 
-var configChannel = 'foosball';
+var configChannel = 'sandbox';
 var timerStarted = false;
 var betsOpen = false;
 var players = [];
@@ -64,7 +64,8 @@ FoosBot.prototype._onStart = function () {
             }
 
             for(var key in data.slackUsers){
-                userMap.set(key, data.slackUsers[key]);
+                // This mapping is intentionally reversed
+                userMap.set(data.slackUsers[key], key);
             }
 
             for(var key in data.betMoney){
