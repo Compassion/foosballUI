@@ -257,7 +257,7 @@ FoosBot.prototype._processBet = function(message) {
     if (betsOpen == false) {
         self.postMessageToChannel(configChannel, ':x: Sorry, ' + userName + ' - betting is not open right now.', {as_user: true});
     } 
-    else if (betMessage[2] == null || betMessage[2] == "" || parseInt(betMessage[2]) == "NaN" || parseInt(betMessage[2]) < 0) {
+    else if (betMessage[2] == null || betMessage[2] == "" || parseInt(betMessage[2]) == NaN || parseInt(betMessage[2]) < 0) {
         self.postMessageToChannel(configChannel, ':thinking_face: Sorry, ' + userName + ' - I don\'t understand your bet request.\nThe bet amount should be numbers only - for example, _bet blue 100_', {as_user: true});
     }
     else if (betMessage[2] > parseInt(userMoney)) {
