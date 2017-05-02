@@ -14,7 +14,7 @@ var async = require('async');
 var doc = new GoogleSpreadsheet(config.spreadsheetId);
 var resultsSheet, betsSheet;
 
-var configChannel = 'sandbox';
+var configChannel = 'foosball';
 var timerStarted = false;
 var betsOpen = false;
 var players = [];
@@ -160,12 +160,15 @@ FoosBot.prototype._payBetWinners = function(winner) {
             
         }
         else if (currentBets[i].Team.toLowerCase() == winner.toLowerCase()) {
-            self.postMessageToChannel(configChannel, ':heavy_plus_sign::heavy_dollar_sign: ' + currentBets[i].Player + ' bet $' + Math.abs(currentBets[i].Amount) + ' on ' + currentBets[i].Team + ' and walks away with $' + currentBets[i].potentialWin + ' :money_mouth_face:', {as_user: true});
+            self.postMessageToChannel(configChannel, ':heavy_plus_sign::heavy_dollar_sign: ' + currentBets[i].Player + ' bet $' + Math.abs(currentBets[i].Amount) + ' on ' + currentBets[i].Team + ' and walks away with $' + currentBets[i].Winnings + ' :money_mouth_face:', {as_user: true});
         
-            currentBets[i].Action = "Bet winnings";
-            currentBets[i].Amount = currentBets[i].potentialWin;
-            delete currentBets[i].potentialWin;
-            self._newRow(currentBets[i], betsSheet);
+            var betRow = currentBets[i];
+
+            delete betRow.Winnings;
+            betRow.Action = "Bet winnings";
+            betRow.Amount = currentBets[i].Winnings;
+
+            self._newRow(betRow, betsSheet);
         }
     }
     
@@ -266,13 +269,13 @@ FoosBot.prototype._processBet = function(message) {
         if(betMessage[1].toLowerCase() == 'blue') {
             bet.Team = 'Blue';
             bet.Amount = amount;
-            bet.potentialWin = amount * currentGame.blueOdds;
+            bet.Winnings = amount * currentGame.blueOdds;
             betMoney.set(userName, userMoney - amount);
         }
         else if(betMessage[1].toLowerCase() == 'yellow') {
             bet.Team = 'Yellow';
             bet.Amount = amount;
-            bet.potentialWin = amount * currentGame.yellowOdds;
+            bet.Winnings = amount * currentGame.yellowOdds;
             betMoney.set(userName, userMoney - amount);
         }
         else {
@@ -280,13 +283,13 @@ FoosBot.prototype._processBet = function(message) {
         }
     }
 
-    if (bet.potentialWin != null) {
+    if (bet.Winnings != null) {
         currentBets.push(bet);
         self.postMessageToChannel(configChannel, ':heavy_dollar_sign: Bet recorded for ' + userName, {as_user: true});
 
         var betRow = bet;
         betRow.Amount = betRow.Amount - (betRow.Amount * 2);
-        delete betRow.potentialWin;
+        delete betRow.Winnings;
 
         self._newRow(betRow, betsSheet);
     }
