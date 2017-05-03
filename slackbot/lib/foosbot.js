@@ -14,7 +14,7 @@ var async = require('async');
 var doc = new GoogleSpreadsheet(config.spreadsheetId);
 var resultsSheet, betsSheet;
 
-var configChannel = 'sandbox';
+var configChannel = 'foosball';
 var timerStarted = false;
 var betsOpen = false;
 var players = [];
