@@ -14,7 +14,7 @@ var async = require('async');
 var doc = new GoogleSpreadsheet(config.spreadsheetId);
 var resultsSheet, betsSheet;
 
-var configChannel = 'foosball';
+var configChannel = 'sandbox';
 var timerStarted = false;
 var betsOpen = false;
 var players = [];
@@ -155,6 +155,8 @@ FoosBot.prototype._payBetWinners = function(winner) {
     var self = this;
 
     for (var i = currentBets.length - 1; i >= 0; i--) {
+        console.log(currentBets[i]);
+
         if (currentBets[i].Team.toLowerCase() != winner.toLowerCase()) {
             self.postMessageToChannel(configChannel, ':heavy_minus_sign::heavy_dollar_sign: ' + currentBets[i].Player + ' bet $' + Math.abs(currentBets[i].Amount) + ' on ' + currentBets[i].Team + ' and walks away with nothing. :worried:', {as_user: true});
             
@@ -162,7 +164,7 @@ FoosBot.prototype._payBetWinners = function(winner) {
         else if (currentBets[i].Team.toLowerCase() == winner.toLowerCase()) {
             self.postMessageToChannel(configChannel, ':heavy_plus_sign::heavy_dollar_sign: ' + currentBets[i].Player + ' bet $' + Math.abs(currentBets[i].Amount) + ' on ' + currentBets[i].Team + ' and walks away with $' + currentBets[i].Winnings + ' :money_mouth_face:', {as_user: true});
         
-            var betRow = currentBets[i];
+            var betRow = JSON.parse(JSON.stringify(currentBets[i]);
 
             delete betRow.Winnings;
             betRow.Action = "Bet winnings";
@@ -252,15 +254,19 @@ FoosBot.prototype._processBet = function(message) {
     var userName = userMap.get(message.user);
     var userMoney = betMoney.get(userName);
 
-    var bet = { "Player" : userName, "Action" : "Placed bet", "Team" : null, "Amount" : null }
+    var bet = { "Player" : userName, "Action" : "Placed bet", "Team" : null, "Amount" : null, "Winnings" : null }
 
     if (betsOpen == false) {
         self.postMessageToChannel(configChannel, ':x: Sorry, ' + userName + ' - betting is not open right now.', {as_user: true});
-    } 
-    else if (betMessage[2] == null || betMessage[2] == "" || parseInt(betMessage[2]) == NaN || parseInt(betMessage[2]) < 0) {
+    }     
+    else if (parseInt(betMessage[2]) == NaN || parseInt(betMessage[2]) < 0) {
+        self.postMessageToChannel(configChannel, ':rage: ' + userName + ' is fined $100 for trying to confuse me.', {as_user: true});
+        self._newRow({ "Player" : userName, "Action" : "Fined by Foosbot", "Team" : "", "Amount" : "100" }, betsSheet);
+    }
+    else if (betMessage[2] == null || betMessage[2] == "") {
         self.postMessageToChannel(configChannel, ':thinking_face: Sorry, ' + userName + ' - I don\'t understand your bet request.\nThe bet amount should be numbers only - for example, _bet blue 100_', {as_user: true});
     }
-    else if (betMessage[2] > parseInt(userMoney)) {
+    else if (betMessage[2] > parseInt(userMoney) || parseInt(userMoney) == undefined) {
         self.postMessageToChannel(configChannel, ':sweat_smile: You don\'t have that much money to throw around, ' + userName + '!', {as_user: true});
     }
     else {
@@ -285,9 +291,9 @@ FoosBot.prototype._processBet = function(message) {
 
     if (bet.Winnings != null) {
         currentBets.push(bet);
-        self.postMessageToChannel(configChannel, ':heavy_dollar_sign: Bet recorded for ' + userName, {as_user: true});
+        self.postMessageToChannel(configChannel, ':heavy_dollar_sign: Bet recorded for ' + userName + ' for $' + bet.Amount + ' | _Potential win of $' + bet.Winnings + '_', {as_user: true});
 
-        var betRow = bet;
+        var betRow = JSON.parse(JSON.stringify(bet);
         betRow.Amount = betRow.Amount - (betRow.Amount * 2);
         delete betRow.Winnings;
 
@@ -306,10 +312,17 @@ FoosBot.prototype._processTip = function(message) {
     var tipOut = { "Player" : userName, "Action" : "Gives tip", "Team" : "", "Amount" : null };
     var tipIn = { "Player" : null, "Action" : "Receives tip", "Team" : "", "Amount" : null };
 
-    if (tipMessage[2] == null || tipMessage[2] == "" || parseInt(tipMessage[2]) == "NaN" || parseInt(tipMessage[2]) < 0) {
+    if (parseInt(tipMessage[2]) == NaN || parseInt(tipMessage[2]) < 0) {
+        self.postMessageToChannel(configChannel, ':rage: ' + userName + ' is fined $100 for trying to confuse me.', {as_user: true});
+        self._newRow(
+            { "Player" : userName, "Action" : "Fined by Foosbot", "Team" : "", "Amount" : "100" }, 
+            betsSheet
+        );
+    }
+    else if (tipMessage[2] == null || tipMessage[2] == "") {
         self.postMessageToChannel(configChannel, ':thinking_face: Sorry, ' + userName + ' - I don\'t understand your tip request.\nThe tip amount should be numbers only - for example, _tip <player> 100_', {as_user: true});
     }
-    else if (tipMessage[2] > parseInt(userMoney)) {
+    else if (tipMessage[2] > parseInt(userMoney) || parseInt(userMoney) == undefined) {
         self.postMessageToChannel(configChannel, ':sweat_smile: You don\'t have that much money to tip with, ' + userName + '!', {as_user: true});
     }
     else {
@@ -322,12 +335,15 @@ FoosBot.prototype._processTip = function(message) {
         tipIn.Player = recipient;
 
         betMoney.set(userName, userMoney - amount);
+        betMoney.set(recipient, userMoney + amount);
     }
 
-    self.postMessageToChannel(configChannel, ':money_with_wings: ' + tipOut.Player + ' tips ' + tipIn.Player + ' $' + tipIn.Amount, {as_user: true});
+    if (tipOut.Amount != null) {
+        self.postMessageToChannel(configChannel, ':money_with_wings: ' + tipOut.Player + ' tips ' + tipIn.Player + ' $' + tipIn.Amount, {as_user: true});
 
-    self._newRow(tipOut, betsSheet);
-    self._newRow(tipIn, betsSheet);
+        self._newRow(tipOut, betsSheet);
+        self._newRow(tipIn, betsSheet);
+    }
 };
 
 FoosBot.prototype._checkRating = function(message) {
