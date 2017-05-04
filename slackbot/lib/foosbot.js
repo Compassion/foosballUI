@@ -306,7 +306,7 @@ FoosBot.prototype._processTip = function(message) {
     var tipOut = { "Player" : userName, "Action" : "Gives tip", "Team" : "", "Amount" : null };
     var tipIn = { "Player" : null, "Action" : "Receives tip", "Team" : "", "Amount" : null };
 
-    if (tipMessage[2] == null || tipMessage[2] == "" || parseInt(tipMessage[2]) == "NaN" || parseInt(tipMessage[2]) < 0) {
+    if (tipMessage[2] == null || tipMessage[2] == "" || parseInt(tipMessage[2]) == NaN || parseInt(tipMessage[2]) < 0) {
         self.postMessageToChannel(configChannel, ':thinking_face: Sorry, ' + userName + ' - I don\'t understand your tip request.\nThe tip amount should be numbers only - for example, _tip <player> 100_', {as_user: true});
     }
     else if (tipMessage[2] > parseInt(userMoney)) {
@@ -373,8 +373,8 @@ FoosBot.prototype._checkBalance = function(message) {
 
     var balanceCheck = message.text.split(" ");
     var userName = userMap.get(message.user);
-
     var player = balanceCheck[1];
+
     if (player == null || player == undefined || player == "") {
         if (betMoney.get(userName) == undefined) {
             self.postMessageToChannel(configChannel, 'I don\'t have a balance for ' + userName, {as_user: true});
@@ -388,7 +388,7 @@ FoosBot.prototype._checkBalance = function(message) {
             self.postMessageToChannel(configChannel, 'I don\'t have a balance for ' + player, {as_user: true});
         } else {
             var money = betMoney.get(player);
-            self.postMessageToChannel(configChannel, player + '\'s current balance is ' + betMoney.get(userName), {as_user: true});
+            self.postMessageToChannel(configChannel, player + '\'s current balance is ' + betMoney.get(player), {as_user: true});
         }
     } 
 };
