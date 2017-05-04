@@ -17,38 +17,42 @@ var gamePlayed = false;
 
 $( document ).ready(function() {
   
-  Tabletop.init( { key: 'https://docs.google.com/spreadsheets/d/11SKnU_s4aYdpcPbw68jUoWRw7gQtP9RTSbDP3uXmsnI/pubhtml?gid=1440610671&single=true',
-                  callback: showPlayerOptions,
-                  simpleSheet: true } )
+  Tabletop.init( 
+    { 
+      key: 'https://docs.google.com/spreadsheets/d/11SKnU_s4aYdpcPbw68jUoWRw7gQtP9RTSbDP3uXmsnI/pubhtml?gid=1440610671&single=true',
+      callback: showPlayerOptions,
+      simpleSheet: true
+    } 
+  )
 });
 
 function showPlayerOptions(data, tabletop) {
   connectToNode();
 
-  slackUsers = data[0];
+  // Remove first two columns
+  for (var i = 0; i < data.length; i++) {
+    delete data[i]['Metric'];
+    delete data[i]['Submetric'];
+  }
+
   attackRatings = data[2];
   defenseRatings = data[3];
   betMoney = data[4];
 
   // Remove currency formatting
-  for (var i = 0; i < betMoney.length; i++) {
-    betMoney[i] = betMoney[i].replace(/[^0-9\.]+/g,"");
+  for (var key in betMoney) {
+    betMoney[key] = betMoney[key].replace(/[^0-9]+/g, '');
   }
 
-  delete attackRatings['Metric'];
-  delete attackRatings['Rating'];
-  delete attackRatings['Submetric'];
-  delete attackRatings['Side of Champions'];
-  delete defenseRatings['Metric'];
-  delete defenseRatings['Rating'];
-  delete defenseRatings['Submetric'];
-  delete defenseRatings['Side of Champions'];
- 
   stats = {
-    "betMoney" : betMoney,
     "attackRatings" : attackRatings,
     "defenseRatings" : defenseRatings,
-    "slackUsers" : slackUsers
+    "slackUsers" : data[0],
+    "betMoney" : betMoney,
+    "defenseWins" : data[10],
+    "attackWins" : data[11],
+    "defenseLosses" : data[13],
+    "attackLosses" : data[14]
   }
 
   _sendStats(stats);
