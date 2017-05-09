@@ -496,7 +496,7 @@ FoosBot.prototype._foosbotResponses = function(message) {
 
     // If not one of the other commands
     if (!self._checkContainsAny( message, highKeywords ) || !self._checkContainsAny( message, lowKeywords ) ) {
-        if (self._checkContainsAllAndAny( message, ['foosbot', 'joke'] )) {
+        if (self._checkContainsAll( message, ['foosbot', 'joke'] )) {
             self.postMessageToChannel(config.channelName, 'You want a joke, ' + userName + '? Hmm, let me think... :thinking_face:', {as_user: true});
             setTimeout( function() { self.postMessageToChannel(config.channelName, '*Jon\'s defense rating!* :joy:', {as_user: true}); }, 2000);
         }

@@ -6,6 +6,8 @@ var betMoney;
 var stats;
 
 var players = [];
+var firstPlayer;
+
 var count = {
     useEasing : true,
     useGrouping : true
@@ -58,7 +60,7 @@ function showPlayerOptions(data, tabletop) {
   _sendStats(stats);
 
   for(key in attackRatings){
-    $('#selector').append('<label class="btn players btn-outline-primary"><span class="glyphicon glyphicon-ok"></span><input type="checkbox" id="'+ key +'" value="'+ key +'">'+ key +'</label>');
+    $('#selector').append('<label class="btn players btn-outline-primary"><span class="glyphicon glyphicon-ok"></span><input type="checkbox" id="' + key + '" value="' + key + '">' + key + '</label>');
     $('#preGame').fadeIn(800);
   }
 }
@@ -80,11 +82,13 @@ function play(source)
     else 
     {
       $('.alert').remove();
-      // Set players and positions
+
       checked = shuffle(checked);
       checked = shuffle(checked);
       checked = shuffle(checked);
-      players = pickPlayers(checked);
+
+      // Set players and positions {
+        players = pickPlayers(checked);
 
       if(source == 'main')
         $('#preGame').fadeOut('slow', renderGame);
@@ -96,18 +100,26 @@ function play(source)
 
 function pickPlayers(checked) 
 {
-  // Make a copy of the array
-  var temp = checked.slice(checked);
+  console.log('Picking players...');
+
   var chosenPlayers = [];
   
-  // Pick four player and shuffle positions
-  for (var i = 0; i < 4; i++) 
+  while($.inArray(firstPlayer, chosenPlayers) == -1)
   {
-    var index = Math.floor(Math.random() * temp.length);
-    var removed = temp.splice(index, 1);
-    chosenPlayers.push(removed[0]);
-  }
+    // Make a copy of the array
+    chosenPlayers = [];
+    var temp = checked.slice(checked);
 
+    // Pick four player and shuffle positions
+    for (var i = 0; i < 4; i++) 
+    {
+      var index = Math.floor(Math.random() * temp.length);
+      var removed = temp.splice(index, 1);
+      chosenPlayers.push(removed[0]);
+    }
+
+    console.log(chosenPlayers);
+  }
   return chosenPlayers;  
 }
 

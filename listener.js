@@ -37,7 +37,12 @@ function connectToNode() {
 
     socket.on('newplayer', function(data){
         playSound(data);
+
         document.getElementById(data).checked = true;
+        if (firstPlayer == null) {
+            firstPlayer = data;
+        }
+
         $('#countdown-players').append('<label class="btn active players btn-outline-primary"><span class="glyphicon glyphicon-ok"></span><input type="checkbox" checked>'+ data +'</label>');
     });
 };
