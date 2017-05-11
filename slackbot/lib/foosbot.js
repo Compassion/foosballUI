@@ -293,7 +293,7 @@ FoosBot.prototype._processBet = function(message) {
     }     
     else if (parseInt(betMessage[2]) == NaN || parseInt(betMessage[2]) < 0) {
         self.postMessageToChannel(config.channelName, ':rage: ' + userName + ' is fined $100 for trying to confuse me.', {as_user: true});
-        self._newRow({ "Player" : userName, "Action" : "Fined by Foosbot", "Team" : "", "Amount" : "100" }, betsSheet);
+        self._newRow({ "Player" : userName, "Action" : "Fined by Foosbot", "Team" : "", "Amount" : "-100" }, betsSheet);
     }
     else if (betMessage[2] == null || betMessage[2] == "") {
         self.postMessageToChannel(config.channelName, ':thinking_face: Sorry, ' + userName + ' - I don\'t understand your bet request.\nThe bet amount should be numbers only - for example, _bet blue 100_', {as_user: true});
