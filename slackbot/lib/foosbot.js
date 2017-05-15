@@ -340,14 +340,15 @@ FoosBot.prototype._processTip = function(message) {
     var tipMessage = message.text.split(" ");
     var userName = userMap.get(message.user);
     var userMoney = betMoney.get(userName);
+    var recipient = tipMessage[1].toLowerCase().capitalize();
 
     var tipOut = { "Player" : userName, "Action" : "Gives tip", "Team" : "", "Amount" : null };
     var tipIn = { "Player" : null, "Action" : "Receives tip", "Team" : "", "Amount" : null };
 
-    if (parseInt(tipMessage[2]) == NaN || parseInt(tipMessage[2]) < 0) {
+    if (parseInt(tipMessage[2]) == NaN || parseInt(tipMessage[2]) < 0 || betMoney.get(recipient) == undefined) {
         self.postMessageToChannel(config.channelName, ':rage: ' + userName + ' is fined $100 for trying to confuse me.', {as_user: true});
         self._newRow(
-            { "Player" : userName, "Action" : "Fined by Foosbot", "Team" : "", "Amount" : "100" }, betsSheet
+            { "Player" : userName, "Action" : "Fined by Foosbot", "Team" : "", "Amount" : "-100" }, betsSheet
         );
     }
     else if (tipMessage[2] == null || tipMessage[2] == "") {
@@ -357,8 +358,8 @@ FoosBot.prototype._processTip = function(message) {
         self.postMessageToChannel(config.channelName, ':sweat_smile: You don\'t have that much money to tip with, ' + userName + '!', {as_user: true});
     }
     else {
-        var recipient = tipMessage[1];
         var amount = parseInt(tipMessage[2]);
+        var recipientMoney = betMoney.get(recipient);
 
         tipOut.Amount = amount - (amount * 2);
 
@@ -420,7 +421,7 @@ FoosBot.prototype._checkBalance = function(message) {
 
     var balanceCheck = message.text.split(" ");
     var userName = userMap.get(message.user);
-    var player = balanceCheck[1];
+    var player = balanceCheck[1].toLowerCase().capitalize();
 
     if (player == null || player == undefined || player == "") {
         if (betMoney.get(userName) == undefined) {
@@ -502,7 +503,7 @@ FoosBot.prototype._foosbotResponses = function(message) {
         }
         if (self._checkContainsAllAndAny( message, ['foosbot'], ['dumb', 'stupid', 'broken'] )) {
             self.postMessageToChannel(config.channelName, ':rage: How dare you besmirch my good name, ' + userName + '! Fined $100.', {as_user: true});
-            self._newRow({ "Player" : userName, "Action" : "Fined by Foosbot", "Team" : "", "Amount" : "100" }, betsSheet);
+            self._newRow({ "Player" : userName, "Action" : "Fined by Foosbot", "Team" : "", "Amount" : "-100" }, betsSheet);
         }
     }
 };
