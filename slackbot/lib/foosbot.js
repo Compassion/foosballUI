@@ -186,20 +186,18 @@ FoosBot.prototype._payBetWinners = function(winner) {
     var self = this;
 
     for (var i = currentBets.length - 1; i >= 0; i--) {
-        console.log(currentBets[i]);
-
         if (currentBets[i].Team.toLowerCase() != winner.toLowerCase()) {
             self.postMessageToChannel(config.channelName, ':heavy_minus_sign::heavy_dollar_sign: ' + currentBets[i].Player + ' bet $' + Math.abs(currentBets[i].Amount) + ' on ' + currentBets[i].Team + ' and walks away with nothing. :worried:', {as_user: true});
             
         }
         else if (currentBets[i].Team.toLowerCase() == winner.toLowerCase()) {
-            self.postMessageToChannel(config.channelName, ':heavy_plus_sign::heavy_dollar_sign: ' + currentBets[i].Player + ' bet $' + Math.abs(currentBets[i].Amount) + ' on ' + currentBets[i].Team + ' and walks away with $' + currentBets[i].Winnings + ' :money_mouth_face:', {as_user: true});
+            self.postMessageToChannel(config.channelName, ':heavy_plus_sign::heavy_dollar_sign: ' + currentBets[i].Player + ' bet $' + Math.abs(currentBets[i].Amount) + ' on ' + currentBets[i].Team + ' and walks away with $' + Math.round(currentBets[i].Winnings) + ' :money_mouth_face:', {as_user: true});
         
             var betRow = JSON.parse(JSON.stringify(currentBets[i]));
 
             delete betRow.Winnings;
             betRow.Action = "Bet winnings";
-            betRow.Amount = currentBets[i].Winnings;
+            betRow.Amount = Math.round(currentBets[i].Winnings);
 
             self._newRow(betRow, betsSheet);
         }
