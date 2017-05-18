@@ -339,6 +339,7 @@ FoosBot.prototype._processTip = function(message) {
     var userName = userMap.get(message.user);
     var userMoney = betMoney.get(userName);
     var recipient = tipMessage[1].toLowerCase().capitalize();
+    var recipientMoney = betMoney.get(userName);
 
     var tipOut = { "Player" : userName, "Action" : "Gives tip", "Team" : "", "Amount" : null };
     var tipIn = { "Player" : null, "Action" : "Receives tip", "Team" : "", "Amount" : null };
@@ -365,7 +366,7 @@ FoosBot.prototype._processTip = function(message) {
         tipIn.Player = recipient;
 
         betMoney.set(userName, userMoney - amount);
-        betMoney.set(recipient, userMoney + amount);
+        betMoney.set(recipient, recipientMoney + amount);
     }
 
     if (tipOut.Amount != null) {
