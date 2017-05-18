@@ -420,7 +420,9 @@ FoosBot.prototype._checkBalance = function(message) {
 
     var balanceCheck = message.text.split(" ");
     var userName = userMap.get(message.user);
-    var player = balanceCheck[1].toLowerCase().capitalize();
+	
+	if (balanceCheck[1] != undefined)
+    	var player = balanceCheck[1].toLowerCase().capitalize();
 
     if (player == null || player == undefined || player == "") {
         if (betMoney.get(userName) == undefined) {
