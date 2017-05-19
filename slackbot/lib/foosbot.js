@@ -338,8 +338,6 @@ FoosBot.prototype._processTip = function(message) {
     var tipMessage = message.text.split(" ");
     var userName = userMap.get(message.user);
     var userMoney = betMoney.get(userName);
-    var recipient = tipMessage[1].toLowerCase().capitalize();
-    var recipientMoney = betMoney.get(userName);
 
     var tipOut = { "Player" : userName, "Action" : "Gives tip", "Team" : "", "Amount" : null };
     var tipIn = { "Player" : null, "Action" : "Receives tip", "Team" : "", "Amount" : null };
@@ -358,6 +356,7 @@ FoosBot.prototype._processTip = function(message) {
     }
     else {
         var amount = parseInt(tipMessage[2]);
+        var recipient = tipMessage[1].charAt(0).toUpperCase() + tipMessage[1].slice(1);
         var recipientMoney = betMoney.get(recipient);
 
         tipOut.Amount = amount - (amount * 2);
@@ -422,7 +421,7 @@ FoosBot.prototype._checkBalance = function(message) {
     var userName = userMap.get(message.user);
 	
 	if (balanceCheck[1] != undefined)
-    	var player = balanceCheck[1].toLowerCase().capitalize();
+        var player = tipMessage[1].charAt(0).toUpperCase() + tipMessage[1].slice(1);
 
     if (player == null || player == undefined || player == "") {
         if (betMoney.get(userName) == undefined) {
