@@ -101,26 +101,35 @@ function play(source)
 function pickPlayers(checked) 
 {
   console.log('Picking players...');
-
   var chosenPlayers = [];
-  
-  while($.inArray(firstPlayer, chosenPlayers) == -1)
-  {
-    // Make a copy of the array
-    chosenPlayers = [];
-    var temp = checked.slice(checked);
 
-    // Pick four player and shuffle positions
-    for (var i = 0; i < 4; i++) 
-    {
-      var index = Math.floor(Math.random() * temp.length);
-      var removed = temp.splice(index, 1);
-      chosenPlayers.push(removed[0]);
+  if (firstPlayer != null) {
+    while($.inArray(firstPlayer, chosenPlayers) == -1) {
+      chosenPlayers = pickRandomPlayers();
     }
-
-    console.log(chosenPlayers);
   }
+  else {
+    chosenPlayers = pickRandomPlayers();
+  }
+
   return chosenPlayers;  
+}
+
+function pickRandomPlayers() {
+  // Make a copy of the array
+  chosenPlayers = [];
+  var temp = checked.slice(checked);
+
+  // Pick four player and shuffle positions
+  for (var i = 0; i < 4; i++) 
+  {
+    var index = Math.floor(Math.random() * temp.length);
+    var removed = temp.splice(index, 1);
+    chosenPlayers.push(removed[0]);
+  }
+
+  console.log(chosenPlayers);
+  return chosenPlayers;
 }
 
 function shuffle(array) {

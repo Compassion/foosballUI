@@ -336,13 +336,18 @@ FoosBot.prototype._processTip = function(message) {
     var self = this;
 
     var tipMessage = message.text.split(" ");
+    var amount = parseInt(tipMessage[2]);
+
     var userName = userMap.get(message.user);
     var userMoney = betMoney.get(userName);
+    
+    var recipient = tipMessage[1].charAt(0).toUpperCase() + tipMessage[1].slice(1);
+    var recipientMoney = betMoney.get(recipient);
 
     var tipOut = { "Player" : userName, "Action" : "Gives tip", "Team" : "", "Amount" : null };
     var tipIn = { "Player" : null, "Action" : "Receives tip", "Team" : "", "Amount" : null };
 
-    if (parseInt(tipMessage[2]) == NaN || parseInt(tipMessage[2]) < 0 || betMoney.get(recipient) == undefined) {
+    if (amount == NaN || amount < 0 || recipientMoney == undefined) {
         self.postMessageToChannel(config.channelName, ':rage: ' + userName + ' is fined $100 for trying to confuse me.', {as_user: true});
         self._newRow(
             { "Player" : userName, "Action" : "Fined by Foosbot", "Team" : "", "Amount" : "-100" }, betsSheet
@@ -355,9 +360,6 @@ FoosBot.prototype._processTip = function(message) {
         self.postMessageToChannel(config.channelName, ':sweat_smile: You don\'t have that much money to tip with, ' + userName + '!', {as_user: true});
     }
     else {
-        var amount = parseInt(tipMessage[2]);
-        var recipient = tipMessage[1].charAt(0).toUpperCase() + tipMessage[1].slice(1);
-        var recipientMoney = betMoney.get(recipient);
 
         tipOut.Amount = amount - (amount * 2);
 
