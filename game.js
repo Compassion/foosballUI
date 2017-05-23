@@ -105,19 +105,19 @@ function pickPlayers(checked)
 
   if (firstPlayer != null) {
     while($.inArray(firstPlayer, chosenPlayers) == -1) {
-      chosenPlayers = pickRandomPlayers();
+      chosenPlayers = pickRandomPlayers(checked);
     }
   }
   else {
-    chosenPlayers = pickRandomPlayers();
+    chosenPlayers = pickRandomPlayers(checked);
   }
 
   return chosenPlayers;  
 }
 
-function pickRandomPlayers() {
+function pickRandomPlayers(checked) {
   // Make a copy of the array
-  chosenPlayers = [];
+  var chosenPlayers = [];
   var temp = checked.slice(checked);
 
   // Pick four player and shuffle positions
