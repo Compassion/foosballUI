@@ -1,8 +1,13 @@
+var slackUsers;
 var attackRatings;
 var defenseRatings;
 var betMoney;
 
+var stats;
+
 var players = [];
+var firstPlayer;
+
 var count = {
     useEasing : true,
     useGrouping : true
@@ -14,27 +19,48 @@ var gamePlayed = false;
 
 $( document ).ready(function() {
   
-  Tabletop.init( { key: 'https://docs.google.com/spreadsheets/d/18Z8ngS2h9iYyk80lxLyiN5tiih__RUL5KKhal-Z6fsw/pubhtml?gid=1440610671&single=true',
-                  callback: showPlayerOptions,
-                  simpleSheet: true } )
+  Tabletop.init( 
+    { 
+      key: 'https://docs.google.com/spreadsheets/d/11SKnU_s4aYdpcPbw68jUoWRw7gQtP9RTSbDP3uXmsnI/pubhtml?gid=1440610671&single=true',
+      callback: showPlayerOptions,
+      simpleSheet: true
+    } 
+  )
 });
 
 function showPlayerOptions(data, tabletop) {
   connectToNode();
 
-  attackRatings = data[1];
-  defenseRatings = data[2];
-  betMoney = data[3];
-  
-  delete attackRatings['Metric'];
-  delete attackRatings['Submetric'];
-  delete attackRatings['Side of Champions'];
-  delete defenseRatings['Metric'];
-  delete defenseRatings['Submetric'];
-  delete defenseRatings['Side of Champions'];
+  // Remove first two columns
+  for (var i = 0; i < data.length; i++) {
+    delete data[i]['Metric'];
+    delete data[i]['Submetric'];
+  }
+
+  attackRatings = data[2];
+  defenseRatings = data[3];
+  betMoney = data[4];
+
+  // Remove currency formatting
+  for (var key in betMoney) {
+    betMoney[key] = betMoney[key].replace(/[^0-9]+/g, '');
+  }
+
+  stats = {
+    "attackRatings" : attackRatings,
+    "defenseRatings" : defenseRatings,
+    "slackUsers" : data[0],
+    "betMoney" : betMoney,
+    "defenseWins" : data[10],
+    "attackWins" : data[11],
+    "defenseLosses" : data[13],
+    "attackLosses" : data[14]
+  }
+
+  _sendStats(stats);
 
   for(key in attackRatings){
-    $('#selector').append('<label class="btn players btn-outline-primary"><span class="glyphicon glyphicon-ok"></span><input type="checkbox" id="'+ key +'" value="'+ key +'">'+ key +'</label>');
+    $('#selector').append('<label class="btn players btn-outline-primary"><span class="glyphicon glyphicon-ok"></span><input type="checkbox" id="' + key + '" value="' + key + '">' + key + '</label>');
     $('#preGame').fadeIn(800);
   }
 }
@@ -56,11 +82,13 @@ function play(source)
     else 
     {
       $('.alert').remove();
-      // Set players and positions
+
       checked = shuffle(checked);
       checked = shuffle(checked);
       checked = shuffle(checked);
-      players = pickPlayers(checked);
+
+      // Set players and positions {
+        players = pickPlayers(checked);
 
       if(source == 'main')
         $('#preGame').fadeOut('slow', renderGame);
@@ -72,10 +100,26 @@ function play(source)
 
 function pickPlayers(checked) 
 {
-  // Make a copy of the array
-  var temp = checked.slice(checked);
+  console.log('Picking players...');
   var chosenPlayers = [];
-  
+
+  if (firstPlayer != null) {
+    while($.inArray(firstPlayer, chosenPlayers) == -1) {
+      chosenPlayers = pickRandomPlayers(checked);
+    }
+  }
+  else {
+    chosenPlayers = pickRandomPlayers(checked);
+  }
+
+  return chosenPlayers;  
+}
+
+function pickRandomPlayers(checked) {
+  // Make a copy of the array
+  var chosenPlayers = [];
+  var temp = checked.slice(checked);
+
   // Pick four player and shuffle positions
   for (var i = 0; i < 4; i++) 
   {
@@ -84,7 +128,8 @@ function pickPlayers(checked)
     chosenPlayers.push(removed[0]);
   }
 
-  return chosenPlayers;  
+  console.log(chosenPlayers);
+  return chosenPlayers;
 }
 
 function shuffle(array) {
@@ -184,8 +229,7 @@ function calculateStakes(bRating, yRating)
       var game = {
         "players" : players,
         "blueWin" : bPercentage,
-        "yellowWin" : yPercentage,
-        "betMoney" : betMoney
+        "yellowWin" : yPercentage
       }
       console.log(game);
       _gameStarted(game);
@@ -228,44 +272,40 @@ function newChart(container, colour, time) {
 function submitData()
 {
   var blueScore = parseInt($('#blue-score').val());
+  var bWin = $('#blue-win-stake-value').html();
+  var bLoss = $('#blue-loss-stake').html();
+
   var yellowScore = parseInt($('#yellow-score').val());
-  var winner = (blueScore > yellowScore) ? 'Blue' : 'Yella';
+  var yWin = $('#yellow-win-stake-value').html();
+  var yLoss = $('#yellow-loss-stake').html();
+
+  var notes =  $('#notes').val();
+
+  var winner = (blueScore > yellowScore) ? 'Blue' : 'Yellow';
+
+  var yellowRatingAmount, blueRatingAmount;
+
+  if (winner == "Blue") {
+    blueRatingAmount = bWin;
+    yellowRatingAmount = yLoss;
+  } else {
+    blueRatingAmount = bLoss;
+    yellowRatingAmount = yWin;
+  }
 
   var result =  {
-                  "blueScore" : blueScore,
-                  "yellowScore" : yellowScore
+                  "Timestamp" : new Date().toLocaleString(),
+                  "Winner" : winner,
+                  "BlueScore" : blueScore,
+                  "YellowScore" : yellowScore,
+                  "BlueAttack" : players[0],
+                  "BlueDefense" : players[1],
+                  "BlueRatingChange": blueRatingAmount,
+                  "YellowAttack": players[2],
+                  "YellowDefense": players[3],
+                  "YellowRatingChange" : yellowRatingAmount,
+                  "Notes" : notes
                 };
 
   _gameFinished(result);
-
-  var q1ID = "entry.247460283";   // Winner
-  var q2ID = "entry.449488357";   // Yellow Score
-  var q3ID = "entry.1023685467";  // Blue Score
-  var q4ID = "entry.569780061";   // Yellow Attack
-  var q5ID = "entry.417127845";   // Yellow Defense
-  var q6ID = "entry.855683837";   // Blue Attack
-  var q7ID = "entry.1044104149";  // Blue Defense
-  var q8ID = "entry.131725794";   // Notes
-
-  var value1 = encodeURIComponent(winner);
-  var value2 = encodeURIComponent(yellowScore);
-  var value3 = encodeURIComponent(blueScore);
-  var value4 = encodeURIComponent(players[2]);
-  var value5 = encodeURIComponent(players[3]);
-  var value6 = encodeURIComponent(players[0]);
-  var value7 = encodeURIComponent(players[1]);
-  var value8 = encodeURIComponent($('#notes').val());
-
-  var baseURL = 'https://docs.google.com/forms/d/e/1FAIpQLScY-Gg9_PbdVVIkMYqMpJJwzoy1FVBZhAFdgoIBOmsNh4wdbQ/formResponse?';
-  var submitRef = 'submit=-2582568362400525186';
-  var submitURL = (baseURL + q1ID + "=" + value1 + "&" + 
-                              q2ID + "=" + value2 + "&" + 
-                              q3ID + "=" + value3 + "&" + 
-                              q4ID + "=" + value4 + "&" + 
-                              q5ID + "=" + value5 + "&" + 
-                              q6ID + "=" + value6 + "&" + 
-                              q7ID + "=" + value7 + "&" +
-                              q8ID + "=" + value8 + "&" + submitRef);
-  console.log(submitURL);
-  document.getElementById('no-target').src = submitURL;
 }

@@ -35,9 +35,7 @@
     </div>
 
     <div class="row" id="game" style="display:none;">
-      
-      <form id="input-form" action="" method="POST" target="no-target">
-      
+            
       <div class="col-md-6 blue">
         <span id="blue-team"><h1>Team Blue</h1></span>
         <div class="row">
@@ -72,7 +70,7 @@
 
         <span id="versus">VS</span>
         <button type="button" class="btn btn-secondary btn-lg" id="reset-submit" onclick="location.reload();"><i class="fa fa-repeat" aria-hidden="true"></i> Reset</button>
-        <button  type="submit" class="btn btn-secondary btn-lg" id="form-submit" onclick="submitData(); this.disabled = true; $(this).html = 'Submitted';">Submit</button>
+        <button type="submit" class="btn btn-secondary btn-lg" id="form-submit" onclick="submitData(); this.disabled = true; $(this).html = 'Submitted';">Submit</button>
         <input class="notes" id="notes" name="notes" placeholder="Notes"/>
 
       <div class="col-md-6 yellow">
@@ -104,12 +102,9 @@
 
         </div>
       </div>
-          <input class="score" id="blue-score" min="0" size="2" name="q1" />
-          <input class="score" id="yellow-score" min="0" size="2" name="q2" />
-      </form>
-
-      <iframe src="" id="no-target" name="no-target" style="display:none;"></iframe>
-      <iframe src="" id="bet-frame" name="no-target" style="display:none;"></iframe>
+      
+      <input class="score" id="blue-score" min="0" size="2" name="q1" />
+      <input class="score" id="yellow-score" min="0" size="2" name="q2" />
 
     </div>
   </div>
